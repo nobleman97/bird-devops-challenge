@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: birdimage
+  labels:
+    app: birdimage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: birdimage
+  template:
+    metadata:
+      labels:
+        app: birdimage
+    spec:
+      containers:
+      - name: birdimage
+        image: 4568910/birdimage:v1
+        ports:
+        - containerPort: 4200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: birdimage
+spec:
+  selector:
+    app: birdimage
+  ports:
+    - protocol: TCP
+      port: 4200
+      targetPort: 4200
+  type: ClusterIP

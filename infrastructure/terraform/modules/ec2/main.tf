@@ -23,6 +23,8 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
   vpc_security_group_ids = var.security_groups
 
+  iam_instance_profile = var.iam_instance_profile
+
   user_data = file(var.user_data)
 
   root_block_device {

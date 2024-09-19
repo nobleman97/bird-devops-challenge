@@ -3,3 +3,4 @@ birdImage/getBirdImage
 **/.terraform
 **/*.lock.hcl
 **/*.tfstate*
+extra.auto.tfvars

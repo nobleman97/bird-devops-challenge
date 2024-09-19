@@ -47,4 +47,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 4201
-  type: ClusterIP
+  type: LoadBalancer

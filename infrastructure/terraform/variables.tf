@@ -1,3 +1,10 @@
+variable "instance_key" {
+  description = ""
+  type = object({
+    name = string
+    public_key = string
+  })
+}
 
 variable "vpc_subnets" {
   description = "A map of objects of subnets configs"
@@ -28,6 +35,8 @@ variable "vpc_subnets" {
 
   }))
 }
+
+
 
 variable "log_bucket_name" {
   description = "Name of bucket where logs will be sent"
@@ -108,13 +117,109 @@ variable "security_groups" {
 variable "machines" {
   description = "A map of object holding values to create EC2 instances"
   type = map(object({
-    instance_type       = string
-    instance_name       = string
-    network_object_name = string
-    subnet_object_name  = string
-    sg_identifier       = string
-    volume_size         = number
-    volume_type         = string
-    user_data           = string
+    instance_type        = string
+    instance_name        = string
+    network_object_name  = string
+    subnet_object_name   = string
+    sg_identifier        = string
+    volume_size          = number
+    volume_type          = string
+    user_data            = string
+    iam_instance_profile = optional(string, null)
+  }))
+}
+
+variable "cloudflare_api_token" {
+  description = "An API token for CloudFlare"
+  type        = string
+  default     = ""
+}
+
+variable "cloudflare_api_key" {
+  description = "An API key for CloudFlare"
+  type        = string
+  default     = ""
+}
+
+variable "cloudflare_email" {
+  description = "An Email for CloudFlare"
+  type        = string
+  default     = ""
+}
+
+variable "cloudflare_zone_id" {
+  description = "Zone ID for CloudFlare"
+  type        = string
+  default     = ""
+}
+
+variable "domain_name" {
+  description = "Domain name for External DNS"
+  type        = string
+  default     = ""
+}
+
+variable "smtp_password" {
+  description = ""
+  type = string
+}
+
+
+variable "albs" {
+  type = list(object({
+    name                = string
+    internal            = bool
+    load_balancer_type  = string
+    subnet_tags         = optional(list(string))
+    security_group_tags = optional(list(string))
+
+    target_groups = list(object({
+      name        = string
+      port        = number
+      protocol    = string
+      machine_ref = string
+      #   vpc_id   = optional(string)
+      health_check = optional(object({
+        path                = string
+        interval            = number
+        timeout             = number
+        healthy_threshold   = number
+        unhealthy_threshold = number
+      }))
+
+      listeners = optional(list(object({
+        id       = string
+        port     = number
+        protocol = string
+        rules = optional(list(object({
+          priority     = number
+          path_pattern = string
+        })))
+      })))
+    }))
+
+    auto_scaling_groups = optional(list(object({
+      desired_capacity          = number
+      max_size                  = number
+      min_size                  = number
+      health_check_type         = string
+      health_check_grace_period = number
+      target_group_name         = optional(string)
+      tags                      = map(string)
+
+      launch_templates = optional(list(object({
+        name_prefix                 = string
+        image_id                    = string
+        instance_type               = string
+        associate_public_ip_address = bool
+
+        auto_scaling_policies = optional(list(object({
+          name               = string
+          scaling_adjustment = number
+          adjustment_type    = string
+          cooldown           = number
+        })))
+      })))
+    })))
   }))
 }

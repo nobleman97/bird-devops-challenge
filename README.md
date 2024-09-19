@@ -230,7 +230,8 @@ In my browser:
 
 
 ### [ Unresolved ]
+- External DNS kept crashing without giving me any reason why. I had to unnstall it and make DNS entries  mannually for now.
 - Grafana & Prometheus Services and Ingress were unreachable  (But I could reach them via Port-forwarding)
-- HTTPS for ingress not working yet.
+- HTTPS for ingress not working yet. (Likely related to the external DNS issue. Would resolve with more time.)
 
 

@@ -97,7 +97,7 @@ ___
 
 <br/>
 
-> ### **P.S:** Before running any `terraform apply` command, I'd recommend you commented out every after: <br/>
+> ### **P.S:** Before running any `terraform apply` command, I'd recommend you comment out every thing after: <br/>
 > #### ######################## <br/>
 > #### # Kubernetes <br/>
 > #### ######################## <br/>

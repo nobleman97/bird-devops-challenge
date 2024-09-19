@@ -1,0 +1,138 @@
+# resource "helm_release" "nginx_ingress" {
+#   name = "nginx-ingress"
+#   chart = "ingress-nginx/ingress-nginx"
+#   namespace = kubernetes_namespace.nginx.id
+#   version = "4.11.2"
+
+#   depends_on = [ kubernetes_namespace.nginx ]
+# }
+
+
+# resource "helm_release" "externaldns" {
+#   name       = "externaldns"
+#   chart      = "bitnami/external-dns"
+#   namespace  = kubernetes_namespace.nginx.id
+#   version = "8.3.8"
+
+#   set {
+#     name  = "provider"
+#     value = "cloudflare"
+#   }
+
+#   set {
+#     name  = "cloudflare.apiToken"
+#     value = var.cloudflare_api_token
+#   }
+
+#   set {
+#     name  = "domainFilters[0]"
+#     value = var.domain_name            
+#   }
+
+#   set {
+#     name  = "policy"
+#     value = "sync"
+#   }
+
+#   set {
+#     name  = "txtOwnerId"
+#     value = "externaldns"
+#   }
+
+#     set {
+#     name  = "extraEnv[0].name"
+#     value = "CF_API_EMAIL"
+#   }
+
+#   set {
+#     name  = "extraEnv[0].value"
+#     value = var.cloudflare_email
+#   }
+
+#   set {
+#     name  = "extraEnv[1].name"
+#     value = "CF_API_KEY"
+#   }
+
+#   set {
+#     name  = "extraEnv[1].value"
+#     value = var.cloudflare_api_key
+#   }
+# }
+
+###########################
+# Monitoring
+###########################
+
+# resource "helm_release" "prometheus" {
+#   name = "prometheus"
+#   chart = "prometheus-community/prometheus"
+#   namespace = kubernetes_namespace.monitoring.id
+#   version = "25.27.0"
+
+#   values = [
+#     "${file("../k8s/values/prom-values.yaml")}"
+#   ]
+# }
+
+# resource "helm_release" "grafana" {
+#   name = "grafana"
+#   chart = "grafana/grafana"
+#   namespace = kubernetes_namespace.monitoring.id
+#   version = "8.5.1"
+
+#   values = [
+#     "${file("../k8s/values/grafana-values.yaml")}"
+#   ]
+# }
+
+# resource "kubernetes_secret" "grafana_smtp_secret" {
+#   metadata {
+#     name      = "grafana-smtp-secret"
+#     namespace = kubernetes_namespace.monitoring.id
+#   }
+
+#   data = {
+#     # password = base64encode(var.smtp_password) 
+#     password = var.smtp_password  
+#   }
+# }
+
+# output "grafana_helm_output" {
+#   value = helm_release.grafana.metadata[0].notes
+# }
+
+
+resource "cloudflare_record" "grafana_dns" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "graf.${var.domain_name}"
+#   type    = "CNAME"                
+#   proxied = false
+#   content = aws_lb.this["app-alb"].dns_name
+
+#   timeouts {
+#     create = "5m"
+#   }
+
+#   lifecycle {
+#     ignore_changes = [proxied, ttl]
+#     create_before_destroy = false
+#   }
+# }
+
+# resource "cloudflare_record" "prometheus_dns" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "prom.${var.domain_name}"
+#   type    = "CNAME"                
+#   proxied = false
+#   content = aws_lb.this["app-alb"].dns_name
+
+#   timeouts {
+#     create = "5m"
+#   }
+
+#   lifecycle {
+#     ignore_changes = [proxied, ttl]
+#     create_before_destroy = false
+#   }
+# }

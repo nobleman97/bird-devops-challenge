@@ -1,0 +1,28 @@
+deployment:
+  name: birdimage
+  replicas: 1
+  labels:
+    app: birdimage
+  container:
+    name: birdimage
+    image: "4568910/birdimage:v1"
+    port: 4200
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  hpa:
+    minReplicas: 1
+    maxReplicas: 5
+    averageUtilization: 70
+
+service:
+  name: birdimage
+  selector:
+    app: birdimage
+  port: 4200
+  targetPort: 4200
+  type: ClusterIP

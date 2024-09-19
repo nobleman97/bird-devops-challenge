@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bird-config
+data:
+  bird_api_url: "http://birdimage:4200"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird
+  labels:
+    app: bird
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bird
+  template:
+    metadata:
+      labels:
+        app: bird
+    spec:
+      containers:
+      - name: bird
+        image: 4568910/bird:v2
+        ports:
+        - containerPort: 4201
+        env:
+        - name: BIRD_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: bird-config
+              key: bird_api_url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bird
+spec:
+  selector:
+    app: bird
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4201
+  type: LoadBalancer

@@ -210,8 +210,17 @@ In my browser:
 <img src=./assets/birdy.png width=90% >
 </p>
 
+<br/>
 
+<br/>
 
+## Extra Features
+- **Pod Autoscaling:** Pod autoscaling was enabled for both APIs. I included it as part of the helm charts I created for each API. 
+- **Security:** Access to servers was locked down to only my CIDR range. All nodes were placed in private subnets and access to application exposed via ingress.
+
+<br/>
+
+<br/>
 
 ## Challenges
 

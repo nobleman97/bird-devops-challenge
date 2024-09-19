@@ -226,12 +226,14 @@ In my browser:
 
 ### [ Resolved ]
 - **Internal DNS not working:** This was due to CoreDNS in k3s. I replaced it with KubeDNS
-- **Ingress not working:** K3s shipped with Traefik. I had to replace it with NGINX and hadle DNS using CDloudflare
+- **Ingress not working:** K3s shipped with Traefik. I had to replace it with NGINX and handle DNS using CloudFlare
 
 
 ### [ Unresolved ]
 - External DNS kept crashing without giving me any reason why. I had to unnstall it and make DNS entries  mannually for now.
 - Grafana & Prometheus Services and Ingress were unreachable  (But I could reach them via Port-forwarding)
 - HTTPS for ingress not working yet. (Likely related to the external DNS issue. Would resolve with more time.)
+
+(...most of these work just fine when I use EKS. But with some tinkering I should have all issues resolved soon.)
 
 

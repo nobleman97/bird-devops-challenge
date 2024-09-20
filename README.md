@@ -7,6 +7,12 @@ This is the bird Application! It was deployed on a `K3s` cluster and bootstrappe
 <img src=./infrastructure/lifi.drawio.svg width=90% >
 </p>
 
+## Headings:
+- Running the Application
+- Standing Up the Infrastructure
+- Connecting to the Cluster
+- [Accessing Applications](#accessing-applications)
+
 ## Running the Application
 First,  I had to make a small change to the bird API `main.go`.
 
@@ -183,7 +189,7 @@ ip-10-0-20-160   Ready    control-plane,master   71m   v1.30.4+k3s1
 ip-10-0-30-41    Ready    <none>                 5s    v1.30.4+k3s1
 ```
 
-## Deploying To The Cluster
+## Connecting To The Cluster
 Now you can uncomment the Kubernetes & Monitoring section in your `main.tf` file and run `terraform apply`
 This will install:
 - Namespaces
@@ -206,7 +212,7 @@ This will install:
 ## Accessing Applications
 > **P.S:** I experienced DNS resolution issues, but replacing CoreDNS with KubeDNS fixed the issue
 
-## 1.) Birdy
+## 1.) Bird API
 
 <p text-align=center>
 <img src=./assets/birdy.png width=90% >

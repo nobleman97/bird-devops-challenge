@@ -77,6 +77,23 @@ resource "cloudflare_record" "birdy_dns" {
   }
 }
 
+resource "cloudflare_record" "kibana_dns" {
+  zone_id = var.cloudflare_zone_id
+  name    = "kib.${var.domain_name}"
+  type    = "CNAME"                
+  proxied = false
+  content = aws_lb.this["app-alb"].dns_name
+
+  timeouts {
+    create = "5m"
+  }
+
+  lifecycle {
+    ignore_changes = [proxied, ttl]
+    create_before_destroy = false
+  }
+}
+
 ########################
 # Kubernetes
 ########################
@@ -210,18 +227,19 @@ resource "kubernetes_secret" "cloudflare_api" {
 ############################
 # Monitoring
 ############################
-# resource "helm_release" "elk" {
-#   name = "elk"
-#   chart = "../k8s/charts/elk"
+resource "helm_release" "elk" {
+  name = "elk"
+  chart = "../k8s/charts/elk"
 
-#   namespace = kubernetes_namespace.monitoring.id
-#   dependency_update = true
-#   upgrade_install = false
+  namespace = kubernetes_namespace.monitoring.id
+  dependency_update = true
+  # upgrade_install = true
 
-#   depends_on = [ kubernetes_namespace.monitoring ]
-# }
 
-# output "elk_helm_output" {
-#   value = helm_release.elk.metadata[0].notes
-# }
+  depends_on = [ kubernetes_namespace.monitoring ]
+}
+
+output "elk_helm_output" {
+  value = helm_release.elk.metadata[0].notes
+}
 

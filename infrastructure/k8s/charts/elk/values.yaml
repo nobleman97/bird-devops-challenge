@@ -1,0 +1,929 @@
+elasticsearch:
+  clusterName: "lifi"
+  nodeGroup: "master"
+
+  # The service that non master groups will try to connect to when joining the cluster
+  # This should be set to clusterName + "-" + nodeGroup for your master group
+  masterService: ""
+
+  # Elasticsearch roles that will be applied to this nodeGroup
+  # These will be set as environment variables. E.g. node.roles=master
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#node-roles
+  roles:
+    - master
+    - data
+    - data_content
+    - data_hot
+    - data_warm
+    - data_cold
+    - ingest
+    - ml
+    - remote_cluster_client
+    - transform
+
+  replicas: 1
+  minimumMasterNodes: 1
+
+  esMajorVersion: ""
+
+  # Allows you to add any config files in /usr/share/elasticsearch/config/
+  # such as elasticsearch.yml and log4j2.properties
+  esConfig: {}
+
+  createCert: true
+
+  esJvmOptions: {}
+
+  # Extra environment variables to append to this nodeGroup
+  # This will be appended to the current 'env:' key. You can use any of the kubernetes env
+  # syntax here
+  extraEnvs: []
+  #  - name: MY_ENVIRONMENT_VAR
+  #    value: the_value_goes_here
+
+  # Allows you to load environment variables from kubernetes secret or config map
+  envFrom: []
+  # - secretRef:
+  #     name: env-secret
+  # - configMapRef:
+  #     name: config-map
+
+  # Disable it to use your own elastic-credential Secret.
+  secret:
+    enabled: true
+    password: "clumsypass#1234" # generated randomly if not defined
+
+  # A list of secrets and their paths to mount inside the pod
+  # This is useful for mounting certificates for security and for mounting
+  # the X-Pack license
+  secretMounts: []
+
+  hostAliases: []
+
+  image: "docker.elastic.co/elasticsearch/elasticsearch"
+  imageTag: "8.5.1"
+  imagePullPolicy: "IfNotPresent"
+
+  podAnnotations: {}
+  # iam.amazonaws.com/role: es-cluster
+
+  # additionals labels
+  labels: {}
+
+  esJavaOpts: "" 
+
+  resources:
+    requests:
+      cpu: "300m"
+      memory: "600Mi"
+    limits:
+      cpu: "400m"
+      memory: "1Gi"
+
+  initResources: {}
+
+  networkHost: "0.0.0.0"
+
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    storageClassName: local-path
+    resources:
+      requests:
+        storage: 30Gi
+
+  rbac:
+    create: false
+    serviceAccountAnnotations: {}
+    serviceAccountName: ""
+    automountToken: true
+
+  podSecurityPolicy:
+    create: false
+    name: ""
+    spec:
+      privileged: true
+      fsGroup:
+        rule: RunAsAny
+      runAsUser:
+        rule: RunAsAny
+      seLinux:
+        rule: RunAsAny
+      supplementalGroups:
+        rule: RunAsAny
+      volumes:
+        - secret
+        - configMap
+        - persistentVolumeClaim
+        - emptyDir
+
+  persistence:
+    enabled: true
+    size: 5Gi
+    annotations: {}
+
+  extraVolumes: []
+
+  extraVolumeMounts: []
+
+  extraContainers: []
+
+  extraInitContainers: []
+
+  # This is the PriorityClass settings as defined in
+  # https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+  priorityClassName: ""
+
+  # By default this will make sure two pods don't end up on the same node
+  # Changing this to a region would allow you to spread pods across regions
+  antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+  # Hard means that by default pods will only be scheduled if there are enough nodes for them
+  # and that they will never end up on the same node. Setting this to soft will do this "best effort"
+  antiAffinity: "soft"
+
+  # This is the node affinity settings as defined in
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
+  nodeAffinity: {}
+
+  # The default is to deploy all pods serially. By setting this to parallel all pods are started at
+  # the same time when bootstrapping the cluster
+  podManagementPolicy: "Parallel"
+
+  # The environment variables injected by service links are not used, but can lead to slow Elasticsearch boot times when
+  # there are many services in the current namespace.
+  # If you experience slow pod startups you probably want to set this to `false`.
+  enableServiceLinks: true
+
+  protocol: https
+  httpPort: 9200
+  transportPort: 9300
+
+  service:
+    enabled: true
+    labels: {}
+    labelsHeadless: {}
+    type: ClusterIP
+    # Consider that all endpoints are considered "ready" even if the Pods themselves are not
+    # https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+    publishNotReadyAddresses: false
+    nodePort: ""
+    annotations: {}
+    httpPortName: http
+    transportPortName: transport
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: ""
+
+  updateStrategy: RollingUpdate
+
+  # This is the max unavailable setting for the pod disruption budget
+  # The default value of 1 will make sure that kubernetes won't allow more than 1
+  # of your pods to be unavailable during maintenance
+  maxUnavailable: 1
+
+  podSecurityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    # readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  # How long to wait for elasticsearch to stop gracefully
+  terminationGracePeriod: 120
+
+  sysctlVmMaxMapCount: 262144
+
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 3
+    timeoutSeconds: 5
+
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html#request-params wait_for_status
+  clusterHealthCheckParams: "wait_for_status=green&timeout=1s"
+
+  ## Use an alternate scheduler.
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+  # Enabling this will publicly expose your Elasticsearch instance.
+  # Only enable this if you have security enabled on your cluster
+  ingress:
+    enabled: false
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    className: "nginx"
+    pathtype: ImplementationSpecific
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+    tls: []
+
+  nameOverride: ""
+  fullnameOverride: ""
+  healthNameOverride: ""
+
+  lifecycle: {}
+
+  sysctlInitContainer:
+    enabled: true
+
+  keystore: []
+
+  networkPolicy:
+    http:
+      enabled: false
+
+    transport:
+      ## Note that all Elasticsearch Pods can talk to themselves using transport port even if enabled.
+      enabled: false
+
+  tests:
+    enabled: true
+
+
+
+
+
+
+
+
+
+
+logstash:
+  replicas: 1
+  logstashConfig: {}
+
+  # Allows you to add any pipeline files in /usr/share/logstash/pipeline/
+  ### ***warn*** there is a hardcoded logstash.conf in the image, override it first
+  logstashPipeline:
+    logstash.conf: |
+      input {
+        beats {
+          port => 5044
+        }
+      }
+
+      output {
+        elasticsearch {
+          hosts => "https://lifi-master:9200"
+          cacert => "/usr/share/logstash/config/lifi-master-certs/ca.crt"
+          user => '${ELASTICSEARCH_USERNAME}'  # Elasticsearch username
+          password => '${ELASTICSEARCH_PASSWORD}' # Elasticsearch password
+          # index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+        }
+      }
+
+  # Allows you to add any pattern files in your custom pattern dir
+  logstashPatternDir: "/usr/share/logstash/patterns/"
+  logstashPattern: {}
+
+  # Extra environment variables to append to this nodeGroup
+  # This will be appended to the current 'env:' key. You can use any of the kubernetes env
+  # syntax here
+  extraEnvs:
+      - name: "ELASTICSEARCH_USERNAME"
+        valueFrom:
+          secretKeyRef:
+            name: lifi-master-credentials
+            key: username
+      - name: "ELASTICSEARCH_PASSWORD"
+        valueFrom:
+          secretKeyRef:
+            name: lifi-master-credentials
+            key: password
+  #  - name: MY_ENVIRONMENT_VAR
+  #    value: the_value_goes_here
+
+  # Allows you to load environment variables from kubernetes secret or config map
+  envFrom: []
+  # - secretRef:
+  #     name: env-secret
+  # - configMapRef:
+  #     name: config-map
+
+  # Add sensitive data to k8s secrets
+  secrets: []
+
+  # A list of secrets and their paths to mount inside the pod
+  secretMounts:
+    - name: "lifi-master-certs"
+      secretName: "lifi-master-certs"
+      path: "/usr/share/logstash/config/lifi-master-certs"
+
+  hostAliases: []
+
+  image: "docker.elastic.co/logstash/logstash"
+  imageTag: "8.5.1"
+  imagePullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+
+  podAnnotations: {}
+
+  # additionals labels
+  labels: {}
+
+  logstashJavaOpts: "-Xmx1g -Xms1g"
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1536Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1536Mi"
+
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 1Gi
+
+  rbac:
+    create: false
+    serviceAccountAnnotations: {}
+    serviceAccountName: ""
+    annotations:
+      {}
+
+  podSecurityPolicy:
+    create: false
+    name: ""
+    spec:
+      privileged: false
+      fsGroup:
+        rule: RunAsAny
+      runAsUser:
+        rule: RunAsAny
+      seLinux:
+        rule: RunAsAny
+      supplementalGroups:
+        rule: RunAsAny
+      volumes:
+        - secret
+        - configMap
+        - persistentVolumeClaim
+
+  persistence:
+    enabled: false
+    annotations: {}
+
+  extraVolumes:
+    []
+
+  extraVolumeMounts:
+    []
+
+  extraContainers:
+    []
+
+  extraInitContainers:
+    []
+
+  priorityClassName: ""
+
+  # By default this will make sure two pods don't end up on the same node
+  # Changing this to a region would allow you to spread pods across regions
+  antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+  # Hard means that by default pods will only be scheduled if there are enough nodes for them
+  # and that they will never end up on the same node. Setting this to soft will do this "best effort"
+  antiAffinity: "soft"
+
+  # This is the node affinity settings as defined in
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  nodeAffinity: {}
+
+  # This is inter-pod affinity settings as defined in
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  podAffinity: {}
+
+  # The default is to deploy all pods serially. By setting this to parallel all pods are started at
+  # the same time when bootstrapping the cluster
+  podManagementPolicy: "Parallel"
+
+  httpPort: 9600
+
+  # Custom ports to add to logstash
+  extraPorts:
+    []
+
+  updateStrategy: RollingUpdate
+
+  # This is the max unavailable setting for the pod disruption budget
+  # The default value of 1 will make sure that kubernetes won't allow more than 1
+  # of your pods to be unavailable during maintenance
+  maxUnavailable: 1
+
+  podSecurityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    # readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  # How long to wait for logstash to stop gracefully
+  terminationGracePeriod: 120
+
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 300
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 3
+
+  ## Use an alternate scheduler.
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+
+  nodeSelector: {}
+  tolerations: []
+
+  nameOverride: ""
+  fullnameOverride: ""
+
+  lifecycle:
+    {}
+
+  service:
+    annotations: {}
+    type: ClusterIP
+    loadBalancerIP: ""
+    ports:
+      - name: beats
+        port: 5044
+        protocol: TCP
+        targetPort: 5044
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+
+  # ingress:
+  #   enabled: true
+  #   annotations:
+  #     nginx.ingress.kubernetes.io/rewrite-target: /$1
+  #     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  #   className: "nginx"
+  #   pathtype: ImplementationSpecific
+  #   hosts:
+  #     - host: logstash.osose.xyz
+  #       paths:
+  #         - path: /beats
+  #           pathType: Prefix
+  #           servicePort: 5044
+  #         - path: /http
+  #           pathType: Prefix
+  #           servicePort: 8080
+  #   tls: []
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    pathtype: ImplementationSpecific
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: logstash.osose.xyz
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: elk-logstash
+                port:
+                  number: 5044
+
+
+
+
+filebeat:
+  daemonset:
+    annotations: {}
+    labels: {}
+    affinity: {}
+    enabled: true
+    envFrom: []
+ 
+    extraEnvs:
+      - name: "ELASTICSEARCH_USERNAME"
+        valueFrom:
+          secretKeyRef:
+            name: lifi-master-credentials
+            key: username
+      - name: "ELASTICSEARCH_PASSWORD"
+        valueFrom:
+          secretKeyRef:
+            name: lifi-master-credentials
+            key: password
+
+    # Allows you to add any config files in /usr/share/filebeat
+    extraVolumes: []
+
+    extraVolumeMounts: []
+    hostNetworking: false
+
+    filebeatConfig:
+      filebeat.yml: |
+        filebeat.inputs:
+        - type: container
+          paths:
+            - /var/log/containers/*.log
+          processors:
+          - add_kubernetes_metadata:
+              host: ${NODE_NAME}
+              matchers:
+              - logs_path:
+                  logs_path: "/var/log/containers/"
+        output.logstash:
+          hosts: ["elk-logstash:5044"]
+
+  # Only used when updateStrategy is set to "RollingUpdate"
+    maxUnavailable: 1
+    nodeSelector: {}
+    # A list of secrets and their paths to mount inside the pod
+    # This is useful for mounting certificates for security other sensitive values
+    secretMounts:
+      - name: lifi-master-certs
+        secretName: lifi-master-certs
+        path: /usr/share/filebeat/certs/
+
+    # Various pod security context settings. Bear in mind that many of these have an impact on Filebeat functioning properly.
+    #
+    # - User that the container will execute as. Typically necessary to run as root (0) in order to properly collect host container logs.
+    # - Whether to execute the Filebeat containers as privileged containers. Typically not necessarily unless running within environments such as OpenShift.
+    securityContext:
+      runAsUser: 0
+      privileged: false
+
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        cpu: "1000m"
+        memory: "200Mi"
+
+    tolerations: []
+
+  deployment:
+    # Annotations to apply to the deployment
+    annotations: {}
+    # additionals labels
+    labels: {}
+    affinity: {}
+    # Include the deployment
+    enabled: false
+    # Extra environment variables for Filebeat container.
+    envFrom: []
+    # - configMapRef:
+    #     name: config-secret
+    extraEnvs: []
+    # Allows you to add any config files in /usr/share/filebeat
+    extraVolumes: []
+    # - name: extras
+    #   emptyDir: {}
+    extraVolumeMounts: []
+
+    filebeatConfig:
+      filebeat.yml: |
+        filebeat.inputs:
+          - type: log
+            paths:
+              - /usr/share/filebeat/logs/filebeat
+        output.logstash:
+          hosts: ["logstash-logstash:5044"]
+    nodeSelector: {}
+    # A list of secrets and their paths to mount inside the pod
+    # This is useful for mounting certificates for security other sensitive values
+    secretMounts: []
+
+    securityContext:
+      runAsUser: 0
+      privileged: false
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        cpu: "1000m"
+        memory: "200Mi"
+    tolerations: []
+
+  # Replicas being used for the filebeat deployment
+  replicas: 1
+
+  extraContainers: ""
+
+  extraInitContainers: []
+
+  # Root directory where Filebeat will write data to in order to persist registry data across pod restarts (file position and other metadata).
+  hostPathRoot: /var/lib
+
+  dnsConfig: {}
+
+  hostAliases: []
+
+  image: "docker.elastic.co/beats/filebeat"
+  imageTag: "8.5.1"
+  imagePullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+
+  livenessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash -e
+          curl --fail 127.0.0.1:5066
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  readinessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash -e
+          filebeat test output
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  # Whether this chart should self-manage its service account, role, and associated role binding.
+  managedServiceAccount: true
+
+  clusterRoleRules:
+    - apiGroups:
+        - ""
+      resources:
+        - namespaces
+        - nodes
+        - pods
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - "apps"
+      resources:
+        - replicasets
+      verbs:
+        - get
+        - list
+        - watch
+
+  podAnnotations: {}
+  # iam.amazonaws.com/role: es-cluster
+
+  # Custom service account override that the pod will use
+  serviceAccount: ""
+
+  # Annotations to add to the ServiceAccount that is created if the serviceAccount value isn't set.
+  serviceAccountAnnotations: {}
+  # eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount
+
+  # How long to wait for Filebeat pods to stop gracefully
+  terminationGracePeriod: 30
+  # This is the PriorityClass settings as defined in
+  # https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+  priorityClassName: ""
+
+  updateStrategy: RollingUpdate
+
+  # Override various naming aspects of this chart
+  # Only edit these if you know what you're doing
+  nameOverride: ""
+  fullnameOverride: ""
+
+
+
+
+
+
+
+
+
+
+
+
+kibana:
+  elasticsearchHosts: "https://lifi-master:9200"
+  elasticsearchCertificateSecret: lifi-master-certs
+  elasticsearchCertificateAuthoritiesFile: ca.crt
+  elasticsearchCredentialSecret: lifi-master-credentials
+
+  replicas: 1
+
+  # Extra environment variables to append to this nodeGroup
+  # This will be appended to the current 'env:' key. You can use any of the kubernetes env
+  # syntax here
+  extraEnvs:
+    - name: "NODE_OPTIONS"
+      value: "--max-old-space-size=1800"
+  #  - name: MY_ENVIRONMENT_VAR
+  #    value: the_value_goes_here
+
+  # Allows you to load environment variables from kubernetes secret or config map
+  envFrom: []
+  # - secretRef:
+  #     name: env-secret
+  # - configMapRef:
+  #     name: config-map
+
+  # A list of secrets and their paths to mount inside the pod
+  # This is useful for mounting certificates for security and for mounting
+  # the X-Pack license
+  secretMounts: []
+  #  - name: kibana-keystore
+  #    secretName: kibana-keystore
+  #    path: /usr/share/kibana/data/kibana.keystore
+  #    subPath: kibana.keystore # optional
+
+  hostAliases: []
+  #- ip: "127.0.0.1"
+  #  hostnames:
+  #  - "foo.local"
+  #  - "bar.local"
+
+  image: "docker.elastic.co/kibana/kibana"
+  imageTag: "8.5.1"
+  imagePullPolicy: "IfNotPresent"
+
+  # additionals labels
+  labels: {}
+
+  annotations: {}
+
+  podAnnotations: {}
+  # iam.amazonaws.com/role: es-cluster
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "700m"
+      memory: "1.3Gi"
+
+  protocol: http
+
+  serverHost: "0.0.0.0"
+
+  healthCheckPath: "/app/kibana"
+
+  # Allows you to add any config files in /usr/share/kibana/config/
+  # such as kibana.yml
+  kibanaConfig: {}
+  #   kibana.yml: |
+  #     key:
+  #       nestedkey: value
+
+  # If Pod Security Policy in use it may be required to specify security context as well as service account
+
+  podSecurityContext:
+    fsGroup: 1000
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    # readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  serviceAccount: ""
+
+  # Whether or not to automount the service account token in the pod. Normally, Kibana does not need this
+  automountToken: true
+
+  # This is the PriorityClass settings as defined in
+  # https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+  priorityClassName: ""
+
+  httpPort: 5601
+
+  extraVolumes:
+    []
+    # - name: extras
+    #   emptyDir: {}
+
+  extraVolumeMounts:
+    []
+    # - name: extras
+    #   mountPath: /usr/share/extras
+    #   readOnly: true
+    #
+
+  extraContainers: []
+  # - name: dummy-init
+  #   image: busybox
+  #   command: ['echo', 'hey']
+
+  extraInitContainers: []
+  # - name: dummy-init
+  #   image: busybox
+  #   command: ['echo', 'hey']
+
+  updateStrategy:
+    type: "Recreate"
+
+  service:
+    type: ClusterIP
+    loadBalancerIP: ""
+    port: 5601
+    nodePort: ""
+    labels: {}
+    annotations: {}
+    # cloud.google.com/load-balancer-type: "Internal"
+    # service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    # service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
+    # service.beta.kubernetes.io/cce-load-balancer-internal-vpc: "true"
+    loadBalancerSourceRanges: []
+    # 0.0.0.0/0
+    httpPortName: http
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    pathtype: ImplementationSpecific
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      # nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    hosts:
+      - host: kib.osose.xyz
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: elk-kibana
+                port:
+                  number: 5601
+    #tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 3
+    timeoutSeconds: 5
+
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  nameOverride: ""
+  fullnameOverride: ""
+
+  lifecycle: {}
+# preStop:
+#   exec:
+#     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
+# postStart:
+#   exec:
+#     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
+

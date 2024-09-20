@@ -194,21 +194,29 @@ This will install:
 > **P.S:** Always ensure your SSH tunnel is up when running `terraform apply`
 > If the tunnel disconnects, run the script to bring it up again.
 
+<br/>
+
+
+
+<br/>
+
+
+
 ## Accessing Applications
-> **P.S:** I experienced DNS resolution issues, but occasionally restarting or deleting the coreDNS pod proved useful
+> **P.S:** I experienced DNS resolution issues, but replacing CoreDNS with KubeDNS fixed the issue
 
-Since its a private cluster and we cannot easily configure ingress, we can test things out by port-forwarding
+## 1.) Birdy
 
-### Test the Bird API
-In one termninal, run:
-```sh
-kubectl port-forward svc/bird -n birdy  4201:4201
-```
-
-In my browser:
 <p text-align=center>
 <img src=./assets/birdy.png width=90% >
 </p>
+
+## 2.) Kibana (Log Monitoring Solution)
+<p text-align=center>
+<img src=./assets/kibana-logs.png width=90% >
+</p>
+
+
 
 <br/>
 

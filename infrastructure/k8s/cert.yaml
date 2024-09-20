@@ -2,23 +2,33 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-dns
+  name: letsencrypt-dns01-issuer
 spec:
   acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: davidstone097@gmail.com
-    server: https://acme-v02.api.letsencrypt.org/directory
-    # privateKeySecretRef:
-    #   name: le-issuer-acct-key
+    privateKeySecretRef:
+      name: letsencrypt-dns01-private-key
     solvers:
     - dns01:
         cloudflare:
-          email: davidstone097@gmail.com
+          email: davidstone097@gmail.com 
           apiTokenSecretRef:
-            name: cloudflare-api-token-secret
+            name: cloudflare-api-key-secret
             key: api-token
-      selector:
-        dnsZones:
-        - 'osose.xyz'
-        - '*.osose.xyz'
 
-
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: birdy-birdy-certificate
+#   namespace: birdy
+# spec:
+#   secretName: birdy-birdy-osose-tls
+#   issuerRef:
+#     name: letsencrypt-dns01-issuer
+#     kind: ClusterIssuer
+#   commonName: birdy.osose.xyz
+#   dnsNames:
+#   - birdy.osose.xyz
+#   - '*.birdy.osose.xyz'

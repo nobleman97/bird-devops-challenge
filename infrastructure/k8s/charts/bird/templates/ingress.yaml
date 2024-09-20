@@ -4,8 +4,8 @@ kind: Ingress
 metadata:
   name: {{ .Values.ingress.name }}
   annotations:
-    # nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # cert-manager.io/cluster-issuer: letsencrypt-dns01-issuer
 spec:
   ingressClassName: nginx
   rules:
@@ -22,5 +22,5 @@ spec:
   # tls:
   # - hosts:
   #   - {{ .Values.ingress.host }}  
-  #   secretName: {{ .Values.ingress.host }}-tls
+  #   secretName: birdy-birdy-osose-tls
 

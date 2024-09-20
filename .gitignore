@@ -4,3 +4,4 @@ birdImage/getBirdImage
 **/*.lock.hcl
 **/*.tfstate*
 extra.auto.tfvars
+**/elk/charts/*

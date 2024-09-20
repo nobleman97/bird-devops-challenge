@@ -108,6 +108,12 @@ resource "kubernetes_namespace" "nginx" {
   }
 }
 
+resource "kubernetes_namespace" "externaldns" {
+  metadata {
+    name = "externaldns"
+  }
+}
+
 resource "helm_release" "cert-manager" {
   name = "cert-manager"
   chart = "cert-manager/cert-manager"
@@ -156,7 +162,19 @@ resource "kubernetes_secret" "cloudflare_api_token" {
   }
 }
 
+resource "kubernetes_secret" "cloudflare_api" {
+  metadata {
+    name      = "cloudflare-api-cred"
+    namespace = kubernetes_namespace.externaldns.id
+  }
 
+  data = {
+    "apiKey" = var.cloudflare_api_key
+    "apiToken" = var.cloudflare_api_token
+    "email" = var.cloudflare_email
+    "zone_id" = var.cloudflare_zone_id
+  }
+}
 
 
 
@@ -175,11 +193,13 @@ resource "kubernetes_secret" "cloudflare_api_token" {
 resource "helm_release" "externaldns" {
   name       = "externaldns"
   chart      = "external-dns/external-dns"
-  # namespace  = kubernetes_namespace.nginx.id
+  namespace  = kubernetes_namespace.externaldns.id
   version = "1.15.0"
 
   values = [ 
     file("../k8s/values/sigs-values.yaml")
    ]
+
+   depends_on = [ kubernetes_secret.cloudflare_api ]
 }
 

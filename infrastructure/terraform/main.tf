@@ -85,7 +85,7 @@ resource "cloudflare_record" "app_dns" {
 ########################
 
 
-# Namespaces
+# ----- Namespaces  ----------
 resource "kubernetes_namespace" "this" {
   for_each = var.k8s_namespaces
 
@@ -93,25 +93,6 @@ resource "kubernetes_namespace" "this" {
     name = each.key
   }
 }
-
-# resource "kubernetes_namespace" "monitoring" {
-#   metadata {
-#     name = "monitoring"
-#   }
-# }
-
-# resource "kubernetes_namespace" "nginx" {
-#   metadata {
-#     name = "nginx-nginx"
-#   }
-# }
-
-# resource "kubernetes_namespace" "externaldns" {
-#   metadata {
-#     name = "externaldns"
-#   }
-# }
-
 
 # -----  Helm Releases ---------
 resource "helm_release" "nginx_ingress" {
@@ -157,16 +138,39 @@ resource "helm_release" "birdimage" {
   depends_on = [ kubernetes_namespace.this["birdy"] ]
 }
 
-resource "helm_release" "elk" {
-  name = "elk"
-  chart = "../k8s/charts/elk"
-
+resource "helm_release" "prometheus" {
+  name = "prometheus"
+  chart = "prometheus-community/prometheus"
   namespace = kubernetes_namespace.this["monitoring"].id
-  dependency_update = true
-  # upgrade_install = true
+  version = "25.27.0"
 
-  depends_on = [ kubernetes_namespace.this["monitoring"] ]
+  values = [
+    "${file("../k8s/values/prom-values.yaml")}"
+  ]
 }
+
+resource "helm_release" "grafana" {
+  name = "grafana"
+  chart = "grafana/grafana"
+  namespace = kubernetes_namespace.this["monitoring"].id
+  version = "8.5.1"
+
+  values = [
+    "${file("../k8s/values/grafana-values.yaml")}"
+  ]
+}
+
+# @Dev: Remove Kibana from chart when installing initially. Add back on second run
+# resource "helm_release" "elk" {
+#   name = "elk"
+#   chart = "../k8s/charts/elk"
+
+#   namespace = kubernetes_namespace.this["monitoring"].id
+#   dependency_update = true
+#   # upgrade_install = true
+
+#   depends_on = [ kubernetes_namespace.this["monitoring"] ]
+# }
 
 
 # --------   Secrets  ---------
@@ -199,30 +203,6 @@ resource "kubernetes_secret" "cloudflare_api" {
   }
 }
 
-
-# resource "helm_release" "externaldns" {
-#   name       = "externaldns"
-#   chart      = "bitnami/external-dns"
-#   # namespace  = kubernetes_namespace.nginx.id
-#   version = "8.3.8"
-
-#   values = [ 
-#     file("../k8s/values/external-dns-values.yaml")
-#    ]
-# }
-
-# resource "helm_release" "externaldns" {
-#   name       = "externaldns"
-#   chart      = "external-dns/external-dns"
-#   namespace  = kubernetes_namespace.externaldns.id
-#   version = "1.15.0"
-
-#   values = [ 
-#     file("../k8s/values/sigs-values.yaml")
-#    ]
-
-#    depends_on = [ kubernetes_secret.cloudflare_api ]
-# }
 
 
 

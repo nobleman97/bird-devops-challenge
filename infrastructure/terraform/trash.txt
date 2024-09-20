@@ -1,3 +1,12 @@
+###########################################
+#
+#  Hi! Welcome to the Recycle Bin.
+#  This is where I keep code that doesn't work, but I don't want to throw away
+#  Have fun!
+#
+###########################################
+
+
 # resource "helm_release" "nginx_ingress" {
 #   name = "nginx-ingress"
 #   chart = "ingress-nginx/ingress-nginx"
@@ -58,6 +67,31 @@
 #     name  = "extraEnv[1].value"
 #     value = var.cloudflare_api_key
 #   }
+# }
+
+# resource "helm_release" "externaldns" {
+#   name       = "externaldns"
+#   chart      = "bitnami/external-dns"
+#   # namespace  = kubernetes_namespace.nginx.id
+#   version = "8.3.8"
+
+#   values = [ 
+#     file("../k8s/values/external-dns-values.yaml")
+#    ]
+# }
+
+
+# resource "helm_release" "externaldns" {
+#   name       = "externaldns"
+#   chart      = "external-dns/external-dns"
+#   namespace  = kubernetes_namespace.externaldns.id
+#   version = "1.15.0"
+
+#   values = [ 
+#     file("../k8s/values/sigs-values.yaml")
+#    ]
+
+#    depends_on = [ kubernetes_secret.cloudflare_api ]
 # }
 
 ###########################

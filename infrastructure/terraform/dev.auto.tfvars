@@ -341,6 +341,20 @@ dns_records = {
     load_balancer_ref = "app-alb"
   }
 
+  "prometheus" = {
+    prefix = "prom"
+    type = "CNAME"
+    proxied = false
+    load_balancer_ref = "app-alb"
+  }
+
+  "grafana" = {
+    prefix = "graf"
+    type = "CNAME"
+    proxied = false
+    load_balancer_ref = "app-alb"
+  }
+
   "birdimage" = {
     prefix = "birdimage"
     type = "CNAME"
@@ -350,7 +364,7 @@ dns_records = {
 }
 
 k8s_namespaces = {
-  "birdy" = "birdy"
+  "birdy" = "birdy2"
   "monitoring" = "monitoring"
   "nginx-nginx" = "nginx-nginx"
   "externaldns" = "externaldns"

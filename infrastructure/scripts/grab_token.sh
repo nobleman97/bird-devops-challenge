@@ -10,8 +10,8 @@ ssh-add ~/.ssh/k8s
 # echo "Type k8s master private ip below:"
 # read master_ip
 
-master_ip=$(terraform output | grep master | awk '{print $3}' | sed 's/\"//g')
-bastion_ip=$(terraform output | grep jumpbox | awk '{print $3}' | sed 's/\"//g')
+master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+bastion_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
 
 echo "What do you want to do? (Type in a number)"
 echo "1.) Get k3s Join Token"

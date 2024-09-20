@@ -226,3 +226,20 @@ variable "albs" {
     })))
   }))
 }
+
+variable "dns_records" {
+  description = "DNS records"
+  type = map(object({
+    prefix = string
+    type = string
+    proxied = bool
+    load_balancer_ref = string
+    
+   }))
+}
+
+variable "k8s_namespaces" {
+  description = "Namespaces for Kubernetes"
+  type = map(string)
+  default = {}
+}

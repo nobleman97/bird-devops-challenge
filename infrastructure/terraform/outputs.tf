@@ -14,3 +14,6 @@ output "private_ip_addresses" {
   }
 }
 
+output "elk_helm_output" {
+  value = helm_release.elk.metadata[0].notes
+}

@@ -26,3 +26,7 @@ service:
   port: 4200
   targetPort: 4200
   type: ClusterIP
+
+ingress:
+  name: "birdimage-ingress"
+  host: "birdimage.osose.xyz"

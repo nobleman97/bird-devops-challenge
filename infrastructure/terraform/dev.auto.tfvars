@@ -325,3 +325,33 @@ albs = [
     ]
   }
 ]
+
+dns_records = {
+  "birdy" = {
+    prefix = "birdy"
+    type = "CNAME"
+    proxied = false
+    load_balancer_ref = "app-alb"
+  }
+
+  "kibana" = {
+    prefix = "kib"
+    type = "CNAME"
+    proxied = false
+    load_balancer_ref = "app-alb"
+  }
+
+  "birdimage" = {
+    prefix = "birdimage"
+    type = "CNAME"
+    proxied = false
+    load_balancer_ref = "app-alb"
+  }
+}
+
+k8s_namespaces = {
+  "birdy" = "birdy"
+  "monitoring" = "monitoring"
+  "nginx-nginx" = "nginx-nginx"
+  "externaldns" = "externaldns"
+}

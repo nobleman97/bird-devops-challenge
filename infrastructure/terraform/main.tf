@@ -60,12 +60,14 @@ module "ec2" {
 ######################
 # DNS
 ######################
-resource "cloudflare_record" "birdy_dns" {
+resource "cloudflare_record" "app_dns" {
+  for_each = var.dns_records 
+
   zone_id = var.cloudflare_zone_id
-  name    = "birdy.${var.domain_name}"
-  type    = "CNAME"                
-  proxied = false
-  content = aws_lb.this["app-alb"].dns_name
+  name    = "${each.value.prefix}.${var.domain_name}"
+  type    = each.value.type  
+  proxied = each.value.proxied
+  content = aws_lb.this[each.value.load_balancer_ref].dns_name
 
   timeouts {
     create = "5m"
@@ -77,58 +79,48 @@ resource "cloudflare_record" "birdy_dns" {
   }
 }
 
-resource "cloudflare_record" "kibana_dns" {
-  zone_id = var.cloudflare_zone_id
-  name    = "kib.${var.domain_name}"
-  type    = "CNAME"                
-  proxied = false
-  content = aws_lb.this["app-alb"].dns_name
-
-  timeouts {
-    create = "5m"
-  }
-
-  lifecycle {
-    ignore_changes = [proxied, ttl]
-    create_before_destroy = false
-  }
-}
 
 ########################
 # Kubernetes
 ########################
 
+
+# Namespaces
+resource "kubernetes_namespace" "this" {
+  for_each = var.k8s_namespaces
+
+  metadata {
+    name = each.key
+  }
+}
+
+# resource "kubernetes_namespace" "monitoring" {
+#   metadata {
+#     name = "monitoring"
+#   }
+# }
+
+# resource "kubernetes_namespace" "nginx" {
+#   metadata {
+#     name = "nginx-nginx"
+#   }
+# }
+
+# resource "kubernetes_namespace" "externaldns" {
+#   metadata {
+#     name = "externaldns"
+#   }
+# }
+
+
+# -----  Helm Releases ---------
 resource "helm_release" "nginx_ingress" {
   name = "nginx-ingress"
   chart = "ingress-nginx/ingress-nginx"
-  namespace = kubernetes_namespace.nginx.id
+  namespace = kubernetes_namespace.this["nginx-nginx"].id
   version = "4.11.2"
 
-  depends_on = [ kubernetes_namespace.nginx ]
-}
-
-resource "kubernetes_namespace" "birdy" {
-  metadata {
-    name = "birdy"
-  }
-}
-
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "monitoring"
-  }
-}
-
-resource "kubernetes_namespace" "nginx" {
-  metadata {
-    name = "nginx-nginx"
-  }
-}
-
-resource "kubernetes_namespace" "externaldns" {
-  metadata {
-    name = "externaldns"
-  }
+  depends_on = [ kubernetes_namespace.this["nginx-nginx"] ]
 }
 
 resource "helm_release" "cert-manager" {
@@ -142,31 +134,42 @@ resource "helm_release" "cert-manager" {
       file("../k8s/values/cm-values.yaml") 
   ]
 
-  depends_on = [ kubernetes_namespace.nginx ]
+  depends_on = [ kubernetes_namespace.this["nginx-nginx"] ]
 }
 
 resource "helm_release" "bird" {
   name = "bird-api"
   chart = "../k8s/charts/bird"
-  namespace = kubernetes_namespace.birdy.id
+  namespace = kubernetes_namespace.this["birdy"].id
   version = "0.1.0"
-  # upgrade_install = false
 
-  # replace = true
-
-  depends_on = [ kubernetes_namespace.birdy ]
+  depends_on = [ kubernetes_namespace.this["birdy"] ]
 }
 
 resource "helm_release" "birdimage" {
   name = "bird-image-api"
   chart = "../k8s/charts/birdimage"
-  namespace = kubernetes_namespace.birdy.id
+  namespace = kubernetes_namespace.this["birdy"].id
   version = "0.1.0"
 
   replace = true
 
-  depends_on = [ kubernetes_namespace.birdy ]
+  depends_on = [ kubernetes_namespace.this["birdy"] ]
 }
+
+resource "helm_release" "elk" {
+  name = "elk"
+  chart = "../k8s/charts/elk"
+
+  namespace = kubernetes_namespace.this["monitoring"].id
+  dependency_update = true
+  # upgrade_install = true
+
+  depends_on = [ kubernetes_namespace.this["monitoring"] ]
+}
+
+
+# --------   Secrets  ---------
 
 resource "kubernetes_secret" "cloudflare_api_key" {
   metadata {
@@ -185,7 +188,7 @@ resource "kubernetes_secret" "cloudflare_api_key" {
 resource "kubernetes_secret" "cloudflare_api" {
   metadata {
     name      = "cloudflare-api-cred"
-    namespace = kubernetes_namespace.externaldns.id
+    namespace = kubernetes_namespace.this["externaldns"].id
   }
 
   data = {
@@ -195,8 +198,6 @@ resource "kubernetes_secret" "cloudflare_api" {
     "zone_id" = var.cloudflare_zone_id
   }
 }
-
-
 
 
 # resource "helm_release" "externaldns" {
@@ -224,22 +225,6 @@ resource "kubernetes_secret" "cloudflare_api" {
 # }
 
 
-############################
-# Monitoring
-############################
-resource "helm_release" "elk" {
-  name = "elk"
-  chart = "../k8s/charts/elk"
-
-  namespace = kubernetes_namespace.monitoring.id
-  dependency_update = true
-  # upgrade_install = true
 
 
-  depends_on = [ kubernetes_namespace.monitoring ]
-}
-
-output "elk_helm_output" {
-  value = helm_release.elk.metadata[0].notes
-}
 

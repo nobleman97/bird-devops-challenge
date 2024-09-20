@@ -192,7 +192,8 @@ This will install:
 - Metric server (Actually installed with k3s)
 
 > **P.S:** Always ensure your SSH tunnel is up when running `terraform apply`
-> If the tunnel disconnects, run the script to bring it up again.
+> If the tunnel disconnects, run the script to bring it up again. <br/>
+> Also , run the tunnel in one termminal, and run kubectl command from another
 
 <br/>
 

@@ -160,3 +160,26 @@ resource "kubernetes_secret" "cloudflare_api_token" {
 
 
 
+
+# resource "helm_release" "externaldns" {
+#   name       = "externaldns"
+#   chart      = "bitnami/external-dns"
+#   # namespace  = kubernetes_namespace.nginx.id
+#   version = "8.3.8"
+
+#   values = [ 
+#     file("../k8s/values/external-dns-values.yaml")
+#    ]
+# }
+
+resource "helm_release" "externaldns" {
+  name       = "externaldns"
+  chart      = "external-dns/external-dns"
+  # namespace  = kubernetes_namespace.nginx.id
+  version = "1.15.0"
+
+  values = [ 
+    file("../k8s/values/sigs-values.yaml")
+   ]
+}
+

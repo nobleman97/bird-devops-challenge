@@ -11,7 +11,7 @@
 # resource "helm_release" "externaldns" {
 #   name       = "externaldns"
 #   chart      = "bitnami/external-dns"
-#   namespace  = kubernetes_namespace.nginx.id
+#   # namespace  = kubernetes_namespace.nginx.id
 #   version = "8.3.8"
 
 #   set {

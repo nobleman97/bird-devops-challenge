@@ -107,6 +107,7 @@ security_groups = {
     sg_description = "Security group for Bastion Instances"
 
     security_group_rules = {
+
       "bastion_kube_api" = {
         type        = "ingress"
         from_port   = 6443
@@ -152,7 +153,7 @@ security_groups = {
         from_port   = 53
         to_port     = 53
         protocol    = "udp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_coredns_tcp" = {
@@ -160,7 +161,7 @@ security_groups = {
         from_port   = 53
         to_port     = 53
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_http" = {
@@ -169,7 +170,6 @@ security_groups = {
         to_port     = 80
         protocol    = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
-        # source_security_group_id = ["alb-sg"]
       }
 
       "cluster_https" = {
@@ -185,7 +185,7 @@ security_groups = {
         from_port   = 6443
         to_port     = 6443
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_kubelet" = {
@@ -193,7 +193,7 @@ security_groups = {
         from_port   = 10250
         to_port     = 10250
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_healthchecks" = {
@@ -201,7 +201,7 @@ security_groups = {
         from_port   = 10255
         to_port     = 10255
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_vxlan" = {
@@ -209,7 +209,7 @@ security_groups = {
         from_port   = 8472
         to_port     = 8472
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["10.0.0.0/16"]
       }
 
       "cluster_ssh" = {

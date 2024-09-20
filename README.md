@@ -1,6 +1,6 @@
 # Bird Aplication Solution
 
-This is the bird Application! It was deployed on a `K3s` and bootstrapped using Bash scripts.
+This is the bird Application! It was deployed on a `K3s` cluster and bootstrapped using Bash scripts.
 
 ## Architecture Diagram
 <p text-align=center>

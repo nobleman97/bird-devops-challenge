@@ -17,13 +17,13 @@ terraform {
     }
   }
 
-  #   backend "s3" {
-  #     bucket         = "infra-shakazu-bucket"
-  #     key            = "state_files/lifi/development.tfstate"
-  #     region         = "us-east-1"
-  #     dynamodb_table = "lifi_tf_lock-dynamo-table"
-  #     encrypt        = true
-  #   }
+    backend "s3" {
+      bucket         = "infra-shakazu-bucket"
+      key            = "state_files/lifi/development.tfstate"
+      region         = "us-east-1"
+      dynamodb_table = "lifi_tf_lock"
+      encrypt        = true
+    }
 }
 
 # Configure the AWS Provider

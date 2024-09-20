@@ -177,8 +177,11 @@ variable "albs" {
       name        = string
       port        = number
       protocol    = string
-      machine_ref = string
-      #   vpc_id   = optional(string)
+      machine_ref = list(string)
+      # list(object({
+      #   name = string
+      # }))
+      
       health_check = optional(object({
         path                = string
         interval            = number

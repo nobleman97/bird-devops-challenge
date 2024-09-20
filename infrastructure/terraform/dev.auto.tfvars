@@ -164,6 +164,22 @@ security_groups = {
         cidr_blocks = ["10.0.0.0/16"]
       }
 
+      "cluster_weave_plane" = {
+        type        = "ingress"
+        from_port   = 6783
+        to_port     = 6783
+        protocol    = "-1"
+        cidr_blocks = ["10.0.0.0/16"]
+      }
+
+      "cluster_weave_plane_udp" = {
+        type        = "ingress"
+        from_port   = 6784
+        to_port     = 6784
+        protocol    = "udp"
+        cidr_blocks = ["10.0.0.0/16"]
+      }
+
       "cluster_http" = {
         type        = "ingress"
         from_port   = 80
@@ -246,7 +262,7 @@ machines = {
   }
 
   "machine_2" = {
-    instance_type        = "t3.medium"
+    instance_type        = "t2.medium"
     instance_name        = "slave_1"
     network_object_name  = "primary"
     subnet_object_name   = "AZ-1-priv_sub-2"
@@ -282,7 +298,10 @@ albs = [
         name        = "app"
         port        = 80
         protocol    = "HTTP"
-        machine_ref = "machine_1"
+        machine_ref = [
+          "machine_2", 
+          "machine_1"
+        ]
         health_check = {
           path                = "/"
           interval            = 30

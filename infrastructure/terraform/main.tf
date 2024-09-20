@@ -151,15 +151,18 @@ resource "helm_release" "birdimage" {
   depends_on = [ kubernetes_namespace.birdy ]
 }
 
-resource "kubernetes_secret" "cloudflare_api_token" {
+resource "kubernetes_secret" "cloudflare_api_key" {
   metadata {
-    name      = "cloudflare-api-token"
+    name      = "cloudflare-api-key-secret"
     namespace = "cert-manager"
   }
 
   data = {
+    "api-key" = var.cloudflare_api_key
     "api-token" = var.cloudflare_api_token
   }
+
+  depends_on = [ helm_release.cert-manager ]
 }
 
 resource "kubernetes_secret" "cloudflare_api" {
@@ -190,16 +193,35 @@ resource "kubernetes_secret" "cloudflare_api" {
 #    ]
 # }
 
-resource "helm_release" "externaldns" {
-  name       = "externaldns"
-  chart      = "external-dns/external-dns"
-  namespace  = kubernetes_namespace.externaldns.id
-  version = "1.15.0"
+# resource "helm_release" "externaldns" {
+#   name       = "externaldns"
+#   chart      = "external-dns/external-dns"
+#   namespace  = kubernetes_namespace.externaldns.id
+#   version = "1.15.0"
 
-  values = [ 
-    file("../k8s/values/sigs-values.yaml")
-   ]
+#   values = [ 
+#     file("../k8s/values/sigs-values.yaml")
+#    ]
 
-   depends_on = [ kubernetes_secret.cloudflare_api ]
-}
+#    depends_on = [ kubernetes_secret.cloudflare_api ]
+# }
+
+
+############################
+# Monitoring
+############################
+# resource "helm_release" "elk" {
+#   name = "elk"
+#   chart = "../k8s/charts/elk"
+
+#   namespace = kubernetes_namespace.monitoring.id
+#   dependency_update = true
+#   upgrade_install = false
+
+#   depends_on = [ kubernetes_namespace.monitoring ]
+# }
+
+# output "elk_helm_output" {
+#   value = helm_release.elk.metadata[0].notes
+# }
 

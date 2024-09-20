@@ -53,6 +53,17 @@ locals {
   ])
 
 
+  alb_target_groups_attachments = flatten([
+    for tg  in local.alb_target_groups : [
+      for ref in tg.machine_ref : {
+        key     = "${tg.key}-${ref}"
+        target_group = tg.key
+        machine_ref  = ref
+      }
+    ]
+  ])
+
+
   alb_security_group_id = module.security_group["alb-sg"].security_groups.id
 
   public_subnets = [

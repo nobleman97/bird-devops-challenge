@@ -218,11 +218,31 @@ This will install:
 <img src=./assets/birdy.png width=90% >
 </p>
 
-## 2.) Kibana (Log Monitoring Solution)
+## 2.) BirdImage API
+
+<p text-align=center>
+<img src=./assets/birdimage.png width=90% >
+</p>
+
+## 3.) Kibana (Log Monitoring Solution)
 <p text-align=center>
 <img src=./assets/kibana-logs.png width=90% >
 </p>
 
+## 4.) Grafana (Log Monitoring Solution)
+<p text-align=center>
+<img src=./assets/grafana-board.png width=90% >
+</p>
+
+## 5.) Grafana Alerts (Log Monitoring Solution)
+<p text-align=center>
+<img src=./assets/graf-alert.png width=90% >
+</p>
+
+## 5.) Prom Alerts (Log Monitoring Solution)
+<p text-align=center>
+<img src=./assets/prom-alerts.png width=90% >
+</p>
 
 
 <br/>

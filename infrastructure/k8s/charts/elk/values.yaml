@@ -736,15 +736,6 @@ filebeat:
 
 
 
-
-
-
-
-
-
-
-
-
 kibana:
   elasticsearchHosts: "https://lifi-master:9200"
   elasticsearchCertificateSecret: lifi-master-certs

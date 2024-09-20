@@ -158,6 +158,8 @@ resource "helm_release" "grafana" {
   values = [
     "${file("../k8s/values/grafana-values.yaml")}"
   ]
+
+  depends_on = [ kubernetes_secret.grafana_smtp_secret ]
 }
 
 # @Dev: Remove Kibana from chart when installing initially. Add back on second run
@@ -200,6 +202,17 @@ resource "kubernetes_secret" "cloudflare_api" {
     "apiToken" = var.cloudflare_api_token
     "email" = var.cloudflare_email
     "zone_id" = var.cloudflare_zone_id
+  }
+}
+
+resource "kubernetes_secret" "grafana_smtp_secret" {
+  metadata {
+    name      = "grafana-smtp-secret"
+    namespace = kubernetes_namespace.this["monitoring"].id
+  }
+
+  data = {
+    password = var.smtp_password  
   }
 }
 

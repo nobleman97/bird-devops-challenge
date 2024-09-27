@@ -35,7 +35,7 @@ jobs:
         run: terraform validate
 
       - name: Create Tfvars file with sensitive data
-        run: echo ${{ secrets.EXTRA_TFVARS }} > "extra.auto.tfvars"
+        run: echo "${{ secrets.EXTRA_TFVARS }}" > "extra.auto.tfvars"
 
       - name: Terraform plan
         id: plan

@@ -35,7 +35,19 @@ jobs:
         run: terraform validate
 
       - name: Create Tfvars file with sensitive data
-        run: echo "${{ secrets.EXTRA_TFVARS }}" > "extra.auto.tfvars"
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
+        
 
       - name: Terraform plan
         id: plan
@@ -61,7 +73,18 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         
       - name: Create Tfvars file with sensitive data
-        run: echo ${{ secrets.EXTRA_TFVARS }} > "extra.auto.tfvars"
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'

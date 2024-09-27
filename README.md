@@ -252,6 +252,7 @@ This will install:
 ## Extra Features
 - **Pod Autoscaling:** Pod autoscaling was enabled for both APIs. I included it as part of the helm charts I created for each API. 
 - **Security:** Access to servers was locked down to only my CIDR range. All nodes were placed in private subnets and access to application exposed via ingress.
+- **Nodes Auto-Join Cluster:** Upon provisioning, worker nodes auto-join cluster. This process was automated using Bash scripts and s3 bucket.
 
 <br/>
 

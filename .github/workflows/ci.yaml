@@ -35,10 +35,12 @@ jobs:
         id: validate
         run: terraform validate
 
+      - name: Create Tfvars file with sensitive data
+        run: echo ${{ secrets.EXTRA_TFVARS }} > "extra.auto.tfvars"
+
       - name: Terraform plan
         id: plan
         run: terraform plan -no-color -input=false
-        continue-on-error: true
 
   terraform-apply:
     needs: terraform-plan
@@ -58,6 +60,9 @@ jobs:
 
       - name: 'Install Terraform'
         uses: hashicorp/setup-terraform@v3
+        
+      - name: Create Tfvars file with sensitive data
+        run: echo ${{ secrets.EXTRA_TFVARS }} > "extra.auto.tfvars"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'

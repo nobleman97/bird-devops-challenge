@@ -1,4 +1,4 @@
-name: 'tf plan'
+name: 'Infra Pipeline'
 
 env:
  TF_LOG: INFO
@@ -41,9 +41,11 @@ jobs:
         continue-on-error: true
 
   terraform-apply:
+    needs: terraform-plan
     name: 'Terraform Apply'
     runs-on: 'ubuntu-latest'
     environment: 'demo'
+    
 
     defaults:
       run:

@@ -1,10 +1,10 @@
-# variable "instance_key" {
-#   description = ""
-#   type = object({
-#     name = string
-#     public_key = string
-#   })
-# }
+variable "instance_key" {
+  description = ""
+  type = object({
+    name = string
+    public_key = string
+  })
+}
 
 variable "vpc_subnets" {
   description = "A map of objects of subnets configs"

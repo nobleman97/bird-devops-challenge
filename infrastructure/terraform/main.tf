@@ -162,7 +162,7 @@ resource "kubernetes_namespace" "this" {
 #   depends_on = [ kubernetes_secret.grafana_smtp_secret ]
 # }
 
-# @Dev: Remove Kibana from chart when installing initially. Add back on second run
+# ## @Dev: Remove Kibana from chart when installing initially. Add back on second run
 # resource "helm_release" "elk" {
 #   name = "elk"
 #   chart = "../k8s/charts/elk"
@@ -175,7 +175,7 @@ resource "kubernetes_namespace" "this" {
 # }
 
 
-# --------   Secrets  ---------
+# ## --------   Secrets  ---------
 
 # resource "kubernetes_secret" "cloudflare_api_key" {
 #   metadata {

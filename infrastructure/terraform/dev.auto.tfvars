@@ -364,8 +364,8 @@ dns_records = {
 }
 
 k8s_namespaces = {
-  # "birdy" = "birdy2"
-  # "monitoring" = "monitoring"
-  # "nginx-nginx" = "nginx-nginx"
-  # "externaldns" = "externaldns"
+  "birdy" = "birdy2"
+  "monitoring" = "monitoring"
+  "nginx-nginx" = "nginx-nginx"
+  "externaldns" = "externaldns"
 }

@@ -82,12 +82,17 @@ jobs:
       - name: Clone repo
         run: |
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
-          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "sudo apt install git -y && git clone https://github.com/nobleman97/bird-devops-challenge.git"
+          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "sudo apt install git -y && git clone git@github.com:nobleman97/bird-devops-challenge.git"
         
       - name: Add sensitive values
         run: |
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
           scp -o StrictHostKeyChecking=no -P 22 extra.auto.tfvars "ubuntu@$jumpbox_ip:~/bird*/infrastructure/terraform/apps"
+
+      - name: Terraform Apply
+        run: |
+          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "cd bird*/infrastructure/terraform/apps && terraform apply --auto-approve"
+          
           
 
     

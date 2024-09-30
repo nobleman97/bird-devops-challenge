@@ -257,31 +257,31 @@ security_groups = {
 
 ### --- Machines ----
 master_servers = {
-  # "machine_1" = {
-  #   instance_type        = "t3.medium"
-  #   instance_name        = "master"
-  #   network_object_name  = "primary"
-  #   subnet_object_name   = "AZ-1-priv_sub-1"
-  #   sg_identifier        = "cluster_sg"
-  #   iam_instance_profile = "KubernetesNodesInstanceProfile"
-  #   volume_size          = 30
-  #   volume_type          = "gp2"
-  #   user_data            = "../../scripts/k3s_master.sh"
-  # }
+  "machine_1" = {
+    instance_type        = "t3.medium"
+    instance_name        = "master"
+    network_object_name  = "primary"
+    subnet_object_name   = "AZ-1-priv_sub-1"
+    sg_identifier        = "cluster_sg"
+    iam_instance_profile = "KubernetesNodesInstanceProfile"
+    volume_size          = 30
+    volume_type          = "gp2"
+    user_data            = "../../scripts/k3s_master.sh"
+  }
 }
 
 worker_servers = {
-  # "machine_2" = {
-  #   instance_type        = "t2.medium"
-  #   instance_name        = "slave_1"
-  #   network_object_name  = "primary"
-  #   subnet_object_name   = "AZ-1-priv_sub-2"
-  #   sg_identifier        = "cluster_sg"
-  #   iam_instance_profile = "KubernetesNodesInstanceProfile"
-  #   volume_size          = 30
-  #   volume_type          = "gp2"
-  #   user_data            = "../../scripts/k3s_worker.sh"
-  # }
+  "machine_2" = {
+    instance_type        = "t2.medium"
+    instance_name        = "slave_1"
+    network_object_name  = "primary"
+    subnet_object_name   = "AZ-1-priv_sub-2"
+    sg_identifier        = "cluster_sg"
+    iam_instance_profile = "KubernetesNodesInstanceProfile"
+    volume_size          = 30
+    volume_type          = "gp2"
+    user_data            = "../../scripts/k3s_worker.sh"
+  }
 
   "jumpbox" = {
     instance_type       = "t2.micro"

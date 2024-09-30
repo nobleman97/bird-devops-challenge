@@ -70,6 +70,10 @@ jobs:
 
       - name: 'Install Terraform'
         uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
         
       - name: Create Tfvars file with sensitive data
         run: |

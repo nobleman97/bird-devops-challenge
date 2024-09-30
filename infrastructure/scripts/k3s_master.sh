@@ -21,8 +21,9 @@ EOF
 
 aws s3 cp join.sh s3://infra-shakazu-bucket/lifi/join.sh
 
-# Send KubeConfig to s3 bucket
-kubeconfig=$(sudo cat /etc/rancher/k3s/k3s.yaml)
-echo $kubeconfig > k3sconfig.yaml
 
-aws s3 cp k3sconfig.yaml s3://infra-shakazu-bucket/lifi/k3sconfig.yaml
+
+# Send KubeConfig to s3 bucket
+sudo cat /etc/rancher/k3s/k3s.yaml > config.yaml
+
+aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml

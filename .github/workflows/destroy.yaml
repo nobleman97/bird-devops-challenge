@@ -16,7 +16,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: "infrastructure/terraform"
+        working-directory: "infrastructure/terraform/infra"
 
     steps:
       - name: Checkout Repo
@@ -61,7 +61,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: "infrastructure/terraform"
+        working-directory: "infrastructure/terraform/infra"
 
     steps:
       - name: Checkout Repo
@@ -69,6 +69,10 @@ jobs:
 
       - name: 'Install Terraform'
         uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
         
       - name: Create Tfvars file with sensitive data
         run: |

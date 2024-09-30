@@ -92,6 +92,14 @@ security_groups = {
         cidr_blocks = ["0.0.0.0/0"]
       }
 
+      "alb_kube" = {
+        type        = "ingress"
+        from_port   = 6443
+        to_port     = 6443
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+
       "alb_egress" = {
         type        = "egress"
         from_port   = 0
@@ -164,21 +172,21 @@ security_groups = {
         cidr_blocks = ["10.0.0.0/16"]
       }
 
-      "cluster_weave_plane" = {
-        type        = "ingress"
-        from_port   = 6783
-        to_port     = 6783
-        protocol    = "-1"
-        cidr_blocks = ["10.0.0.0/16"]
-      }
+      # "cluster_weave_plane" = {
+      #   type        = "ingress"
+      #   from_port   = 6783
+      #   to_port     = 6783
+      #   protocol    = "-1"
+      #   cidr_blocks = ["10.0.0.0/16"]
+      # }
 
-      "cluster_weave_plane_udp" = {
-        type        = "ingress"
-        from_port   = 6784
-        to_port     = 6784
-        protocol    = "udp"
-        cidr_blocks = ["10.0.0.0/16"]
-      }
+      # "cluster_weave_plane_udp" = {
+      #   type        = "ingress"
+      #   from_port   = 6784
+      #   to_port     = 6784
+      #   protocol    = "udp"
+      #   cidr_blocks = ["10.0.0.0/16"]
+      # }
 
       "cluster_http" = {
         type        = "ingress"
@@ -318,6 +326,34 @@ albs = [
           {
             id       = "http"
             port     = 80
+            protocol = "HTTP"
+            rules = [{
+              path_pattern = "/*"
+              priority     = 1
+            }]
+          }
+        ]
+      },
+
+      {
+        name        = "kube"
+        port        = 6443
+        protocol    = "HTTP"
+        machine_ref = [
+          "machine_1"
+        ]
+        health_check = {
+          path                = "/"
+          interval            = 30
+          timeout             = 5
+          healthy_threshold   = 5
+          unhealthy_threshold = 2
+        }
+
+        listeners = [
+          {
+            id       = "kube"
+            port     = 6443
             protocol = "HTTP"
             rules = [{
               path_pattern = "/*"

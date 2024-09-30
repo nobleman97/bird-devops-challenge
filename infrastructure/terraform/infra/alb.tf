@@ -86,3 +86,7 @@ resource "aws_lb_target_group_attachment" "alb_to_machine_attachment" {
                           module.master_servers[each.value.machine_ref].instance_id
                         )
 }
+
+output "alb" {
+value = aws_lb.this["app-alb"].dns_name
+}

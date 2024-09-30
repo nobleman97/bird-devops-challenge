@@ -59,6 +59,7 @@ jobs:
 
       - name: Set up SSH
         run: |
+          terraform output 
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
           echo "bastion is $jumpbox_ip"
           sudo apt update

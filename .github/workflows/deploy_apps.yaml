@@ -56,15 +56,13 @@ jobs:
           sudo apt update -y
           sudo snap install aws-cli --classic || echo "already installed"
 
-          aws s3 ls  s3://infra-shakazu-bucket/lifi/
+          aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
 
-          # aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
-
-          # master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+          master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
          
-          # sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml || echo "all good"
+          sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml || echo "all good"
 
-          # aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
+          aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
 
       - name: Set up SSH
         run: |
@@ -72,7 +70,8 @@ jobs:
           echo "bastion is $jumpbox_ip"
           sudo apt update
           sudo apt install -y openssh-client
-          eval $(ssh-agent -s)
+          # eval $(ssh-agent -s)
+          ssh-add -D
           echo "$jumpbox_ip" | tr -d '\r' | ssh-add -
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh

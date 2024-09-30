@@ -60,6 +60,7 @@ jobs:
       - name: Set up SSH
         run: |
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+          echo "bastion is $jumpbox_ip"
           sudo apt update
           sudo apt install -y openssh-client
           eval $(ssh-agent -s)

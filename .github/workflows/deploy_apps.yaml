@@ -49,6 +49,9 @@ jobs:
           sudo apt update -y
           sudo snap install aws-cli --classic || echo "already installed"
 
+          export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+          export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
           aws s3 ls  s3://infra-shakazu-bucket/lifi/
 
           # aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml

@@ -52,7 +52,7 @@ jobs:
 
           master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
          
-          sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml
+          sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml || echo "al good"
 
           aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
 

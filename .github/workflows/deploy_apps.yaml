@@ -18,6 +18,30 @@ jobs:
         working-directory: "infrastructure/terraform/infra"
     
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: 'Install Terraform'
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Create Tfvars file with sensitive data
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
+
       - name: 'Grab KubeConfig'
         run: |
           sudo apt update -y
@@ -42,20 +66,6 @@ jobs:
           ssh-keyscan "$jumpbox_ip" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-
-      - name: Create Tfvars file with sensitive data
-        run: |
-          cat <<EOF > extra.auto.tfvars
-          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
-          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
-          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
-          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
-          instance_key = {
-            name   = "lifi"
-            public_key = "${{ secrets.PUBLIC_KEY }}"
-          }
-          smtp_password = "${{ secrets.SMTP_PWD }}"
-          EOF
 
       - name: Clone repo
         run: |

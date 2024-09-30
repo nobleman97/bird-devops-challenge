@@ -1,4 +1,4 @@
-name: 'Deploy Pipeline'
+name: 'Destroy Pipeline'
 
 env:
  TF_LOG: INFO

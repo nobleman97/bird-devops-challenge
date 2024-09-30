@@ -48,13 +48,14 @@ jobs:
         run: |
           sudo apt update -y
           sudo snap install aws-cli --classic || echo "already installed"
-          aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
 
-          master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+          # aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
+
+          # master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
          
-          sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml || echo "al good"
+          # sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml || echo "all good"
 
-          aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
+          # aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
 
       - name: Set up SSH
         run: |

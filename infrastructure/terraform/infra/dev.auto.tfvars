@@ -129,7 +129,7 @@ security_groups = {
         from_port   = 22
         to_port     = 22
         protocol    = "tcp"
-        cidr_blocks = ["102.0.0.0/8", "197.210.0.0/16" ]
+        cidr_blocks = ["0.0.0.0/0"]
       }
 
       "bastion_http" = {
@@ -171,22 +171,6 @@ security_groups = {
         protocol    = "tcp"
         cidr_blocks = ["10.0.0.0/16"]
       }
-
-      # "cluster_weave_plane" = {
-      #   type        = "ingress"
-      #   from_port   = 6783
-      #   to_port     = 6783
-      #   protocol    = "-1"
-      #   cidr_blocks = ["10.0.0.0/16"]
-      # }
-
-      # "cluster_weave_plane_udp" = {
-      #   type        = "ingress"
-      #   from_port   = 6784
-      #   to_port     = 6784
-      #   protocol    = "udp"
-      #   cidr_blocks = ["10.0.0.0/16"]
-      # }
 
       "cluster_http" = {
         type        = "ingress"

@@ -29,8 +29,6 @@ jobs:
           sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml
 
           aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
-          
-      - name: 'SSH into bastion configure Kubeconfig'
 
       - name: Set up SSH
         run: |

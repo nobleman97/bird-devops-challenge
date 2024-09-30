@@ -70,7 +70,7 @@ jobs:
           echo "bastion is $jumpbox_ip"
           sudo apt update
           sudo apt install -y openssh-client
-          # eval $(ssh-agent -s)
+          eval $(ssh-agent -s)
           ssh-add -D
           echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
           mkdir -p ~/.ssh

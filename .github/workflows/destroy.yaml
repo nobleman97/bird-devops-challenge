@@ -1,0 +1,89 @@
+name: 'Deploy Pipeline'
+
+env:
+ TF_LOG: INFO
+ AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-plan:
+    name: 'Terraform plan'
+    runs-on: 'ubuntu-latest'
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: "infrastructure/terraform"
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: 'Install Terraform'
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+
+      - name: Create Tfvars file with sensitive data
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
+        
+
+      - name: Terraform plan
+        id: plan
+        run: terraform plan -no-color -input=false
+
+  terraform-destroy:
+    needs: terraform-plan
+    name: 'Terraform Destroy'
+    runs-on: 'ubuntu-latest'
+    environment: 'demo'
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: "infrastructure/terraform"
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: 'Install Terraform'
+        uses: hashicorp/setup-terraform@v3
+        
+      - name: Create Tfvars file with sensitive data
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
+
+      - name: Terraform Destroy
+        if: github.ref == 'refs/heads/main'
+        run: terraform destroy --auto-approve -input=false

@@ -114,7 +114,7 @@ variable "security_groups" {
   }
 }
 
-variable "machines" {
+variable "master_servers" {
   description = "A map of object holding values to create EC2 instances"
   type = map(object({
     instance_type        = string
@@ -129,40 +129,21 @@ variable "machines" {
   }))
 }
 
-variable "cloudflare_api_token" {
-  description = "An API token for CloudFlare"
-  type        = string
-  default     = ""
+variable "worker_servers" {
+  description = "A map of object holding values to create EC2 instances"
+  type = map(object({
+    instance_type        = string
+    instance_name        = string
+    network_object_name  = string
+    subnet_object_name   = string
+    sg_identifier        = string
+    volume_size          = number
+    volume_type          = string
+    user_data            = string
+    iam_instance_profile = optional(string, null)
+  }))
 }
 
-variable "cloudflare_api_key" {
-  description = "An API key for CloudFlare"
-  type        = string
-  default     = ""
-}
-
-variable "cloudflare_email" {
-  description = "An Email for CloudFlare"
-  type        = string
-  default     = ""
-}
-
-variable "cloudflare_zone_id" {
-  description = "Zone ID for CloudFlare"
-  type        = string
-  default     = ""
-}
-
-variable "domain_name" {
-  description = "Domain name for External DNS"
-  type        = string
-  default     = ""
-}
-
-variable "smtp_password" {
-  description = ""
-  type = string
-}
 
 
 variable "albs" {
@@ -227,19 +208,5 @@ variable "albs" {
   }))
 }
 
-variable "dns_records" {
-  description = "DNS records"
-  type = map(object({
-    prefix = string
-    type = string
-    proxied = bool
-    load_balancer_ref = string
-    
-   }))
-}
 
-variable "k8s_namespaces" {
-  description = "Namespaces for Kubernetes"
-  type = map(string)
-  default = {}
-}
+

@@ -2,7 +2,7 @@ name_prefix             = "lifi"
 log_bucket_name         = "s3-access-logs-dev-1"
 vpc_cidr                = "10.0.0.0/16"
 enable_internet_gateway = true
-domain_name             = "osose.xyz"
+
 
 vpc_subnets = {
   "AZ-1-pub_sub-1" = {
@@ -248,7 +248,7 @@ security_groups = {
 }
 
 ### --- Machines ----
-machines = {
+master_servers = {
   "machine_1" = {
     instance_type        = "t3.medium"
     instance_name        = "master"
@@ -258,20 +258,22 @@ machines = {
     iam_instance_profile = "KubernetesNodesInstanceProfile"
     volume_size          = 30
     volume_type          = "gp2"
-    user_data            = "../scripts/k3s_master.sh"
+    user_data            = "../../scripts/k3s_master.sh"
   }
+}
 
-  # "machine_2" = {
-  #   instance_type        = "t2.medium"
-  #   instance_name        = "slave_1"
-  #   network_object_name  = "primary"
-  #   subnet_object_name   = "AZ-1-priv_sub-2"
-  #   sg_identifier        = "cluster_sg"
-  #   iam_instance_profile = "KubernetesNodesInstanceProfile"
-  #   volume_size          = 30
-  #   volume_type          = "gp2"
-  #   user_data            = "../scripts/k3s_worker.sh"
-  # }
+worker_servers = {
+  "machine_2" = {
+    instance_type        = "t2.medium"
+    instance_name        = "slave_1"
+    network_object_name  = "primary"
+    subnet_object_name   = "AZ-1-priv_sub-2"
+    sg_identifier        = "cluster_sg"
+    iam_instance_profile = "KubernetesNodesInstanceProfile"
+    volume_size          = 30
+    volume_type          = "gp2"
+    user_data            = "../../scripts/k3s_worker.sh"
+  }
 
   "jumpbox" = {
     instance_type       = "t2.micro"
@@ -282,9 +284,11 @@ machines = {
     iam_instance_profile = "KubernetesNodesInstanceProfile"
     volume_size         = 30
     volume_type         = "gp2"
-    user_data           = "../scripts/apt_update.sh"
+    user_data           = "../../scripts/apt_update.sh"
   }
 }
+
+
 
 albs = [
   {
@@ -299,7 +303,7 @@ albs = [
         port        = 80
         protocol    = "HTTP"
         machine_ref = [
-          # "machine_2", 
+          "machine_2", 
           "machine_1"
         ]
         health_check = {
@@ -325,47 +329,3 @@ albs = [
     ]
   }
 ]
-
-dns_records = {
-  "birdy" = {
-    prefix = "birdy"
-    type = "CNAME"
-    proxied = false
-    load_balancer_ref = "app-alb"
-  }
-
-  "kibana" = {
-    prefix = "kib"
-    type = "CNAME"
-    proxied = false
-    load_balancer_ref = "app-alb"
-  }
-
-  "prometheus" = {
-    prefix = "prom"
-    type = "CNAME"
-    proxied = false
-    load_balancer_ref = "app-alb"
-  }
-
-  "grafana" = {
-    prefix = "graf"
-    type = "CNAME"
-    proxied = false
-    load_balancer_ref = "app-alb"
-  }
-
-  "birdimage" = {
-    prefix = "birdimage"
-    type = "CNAME"
-    proxied = false
-    load_balancer_ref = "app-alb"
-  }
-}
-
-k8s_namespaces = {
-  "birdy" = "birdy2"
-  "monitoring" = "monitoring"
-  "nginx-nginx" = "nginx-nginx"
-  "externaldns" = "externaldns"
-}

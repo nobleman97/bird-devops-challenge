@@ -1,6 +1,5 @@
 locals {
 
-
   albs = flatten([
     for alb in var.albs : {
       name = alb.name

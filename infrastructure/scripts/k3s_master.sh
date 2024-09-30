@@ -20,3 +20,9 @@ curl -sfL https://get.k3s.io | K3S_URL="https://$master_ip:6443" K3S_TOKEN="$tok
 EOF
 
 aws s3 cp join.sh s3://infra-shakazu-bucket/lifi/join.sh
+
+# Send KubeConfig to s3 bucket
+kubeconfig=$(sudo cat /etc/rancher/k3s/k3s.yaml)
+echo $kubeconfig > k3sconfig.yaml
+
+aws s3 cp k3sconfig.yaml s3://infra-shakazu-bucket/lifi/k3sconfig.yaml

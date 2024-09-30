@@ -75,12 +75,14 @@ resource "aws_lb_listener_rule" "this" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "master_attachment" {
+resource "aws_lb_target_group_attachment" "alb_to_machine_attachment" {
   for_each = {
     for attachment in local.alb_target_groups_attachments :
     attachment.key => attachment
   }
 
   target_group_arn = aws_lb_target_group.this[each.value.target_group].arn
-  target_id        = module.ec2[each.value.machine_ref].instance_id
+  target_id        = try(module.worker_servers[each.value.machine_ref].instance_id, 
+                          module.master_servers[each.value.machine_ref].instance_id
+                        )
 }

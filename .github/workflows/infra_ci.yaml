@@ -6,8 +6,7 @@ env:
  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   terraform-plan:
@@ -17,7 +16,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: "infrastructure/terraform"
+        working-directory: "infrastructure/terraform/infra/"
 
     steps:
       - name: Checkout Repo
@@ -63,7 +62,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: "infrastructure/terraform"
+        working-directory: "infrastructure/terraform/infra"
 
     steps:
       - name: Checkout Repo
@@ -88,4 +87,4 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply --auto-approve -input=false

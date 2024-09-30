@@ -19,7 +19,7 @@ terraform {
 
     backend "s3" {
       bucket         = "infra-shakazu-bucket"
-      key            = "state_files/lifi/development.tfstate"
+      key            = "state_files/lifi/development_infra.tfstate"
       region         = "us-east-1"
       dynamodb_table = "lifi_tf_lock"
       encrypt        = true
@@ -31,19 +31,4 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Located in a different tfvars file
-provider "cloudflare" {
-  email   = var.cloudflare_email
-  api_key = var.cloudflare_api_key
-}
-
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
-  }
-}
-
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
 

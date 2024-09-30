@@ -93,43 +93,43 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: terraform apply --auto-approve -input=false
 
-terraform-apply:
-    needs: terraform-plan
-    name: 'Terraform Apply'
-    runs-on: 'ubuntu-latest'
-    environment: 'demo'
+  # install-apps:
+  #   needs: terraform-plan
+  #   name: 'Terraform Apply'
+  #   runs-on: 'ubuntu-latest'
+  #   environment: 'demo'
     
 
-    defaults:
-      run:
-        shell: bash
-        working-directory: "infrastructure/terraform/infra"
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #       working-directory: "infrastructure/terraform/infra"
 
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v2
 
-      - name: 'Install Terraform'
-        uses: hashicorp/setup-terraform@v3
+  #     - name: 'Install Terraform'
+  #       uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+  #     - name: Terraform Init
+  #       id: init
+  #       run: terraform init
         
-      - name: Create Tfvars file with sensitive data
-        run: |
-          cat <<EOF > extra.auto.tfvars
-          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
-          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
-          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
-          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
-          instance_key = {
-            name   = "lifi"
-            public_key = "${{ secrets.PUBLIC_KEY }}"
-          }
-          smtp_password = "${{ secrets.SMTP_PWD }}"
-          EOF
+  #     - name: Create Tfvars file with sensitive data
+  #       run: |
+  #         cat <<EOF > extra.auto.tfvars
+  #         cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+  #         cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+  #         cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+  #         cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+  #         instance_key = {
+  #           name   = "lifi"
+  #           public_key = "${{ secrets.PUBLIC_KEY }}"
+  #         }
+  #         smtp_password = "${{ secrets.SMTP_PWD }}"
+  #         EOF
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply --auto-approve -input=false
+  #     - name: Terraform Apply
+  #       if: github.ref == 'refs/heads/main'
+  #       run: terraform apply --auto-approve -input=false

@@ -2,6 +2,8 @@
 
 sudo apt update -y
 
+sleep 5s
+
 sudo snap install aws-cli --classic
 
 curl -sfL https://get.k3s.io | sh -s - --disable=traefik  --disable=coredns

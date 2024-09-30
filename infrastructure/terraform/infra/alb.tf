@@ -87,6 +87,6 @@ resource "aws_lb_target_group_attachment" "alb_to_machine_attachment" {
                         )
 }
 
-output "alb" {
+output "alb-dns-name" {
 value = aws_lb.this["app-alb"].dns_name
 }

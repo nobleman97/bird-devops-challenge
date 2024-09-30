@@ -1,15 +1,20 @@
 #!/bin/bash
 
-ssh-add -D
-ssh-add ~/.ssh/k8s
+# Install Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-# echo "Type Bastion IP address below:"
-# read bastion_ip
+# Configure kubectl
+aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
+mkdir ~/.kube
+cat config.yaml > ~/.kube/config
 
-# echo "Type k8s master private ip below:"
-# read master_ip
+# Install Terraform
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
 
-master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
-bastion_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
-
-ssh -L 6443:$master_ip:6443 ubuntu@$bastion_ip
+# run terraform apply
+cd ../terraform/apps
+terraform init
+terraform plan
+terraform apply --auto-approve

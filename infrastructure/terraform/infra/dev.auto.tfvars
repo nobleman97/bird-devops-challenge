@@ -333,35 +333,35 @@ albs = [
             }]
           }
         ]
-      },
-
-      {
-        name        = "kube"
-        port        = 6443
-        protocol    = "HTTP"
-        machine_ref = [
-          "machine_1"
-        ]
-        health_check = {
-          path                = "/"
-          interval            = 30
-          timeout             = 5
-          healthy_threshold   = 5
-          unhealthy_threshold = 2
-        }
-
-        listeners = [
-          {
-            id       = "kube"
-            port     = 6443
-            protocol = "HTTP"
-            rules = [{
-              path_pattern = "/*"
-              priority     = 1
-            }]
-          }
-        ]
       }
+
+      # {
+      #   name        = "kube"
+      #   port        = 6443
+      #   protocol    = "HTTPS"
+      #   machine_ref = [
+      #     "machine_1"
+      #   ]
+      #   health_check = {
+      #     path                = "/"
+      #     interval            = 30
+      #     timeout             = 5
+      #     healthy_threshold   = 5
+      #     unhealthy_threshold = 2
+      #   }
+
+      #   listeners = [
+      #     {
+      #       id       = "kube"
+      #       port     = 6443
+      #       protocol = "HTTPS"
+      #       rules = [{
+      #         path_pattern = "/*"
+      #         priority     = 1
+      #       }]
+      #     }
+      #   ]
+      # }
     ]
   }
 ]

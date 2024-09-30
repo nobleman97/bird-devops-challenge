@@ -1,0 +1,71 @@
+name: 'Apps Pipeline'
+
+env:
+ TF_LOG: INFO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  configure-jumpbox:
+    name: 'Deploy Apps'
+    runs-on: 'ubuntu-latest'
+    environment: 'demo'
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: "infrastructure/terraform/infra"
+    
+    steps:
+      - name: 'Grab KubeConfig'
+        run: |
+          sudo apt update -y
+          sudo snap install aws-cli --classic || echo "already installed"
+          aws s3 cp  s3://infra-shakazu-bucket/lifi/config.yaml config.yaml
+
+          master_ip=$(terraform output | grep master | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+         
+          sed -i "s|https://127.0.0.1|http://$master_ip|g" config.yaml
+
+          aws s3 cp config.yaml s3://infra-shakazu-bucket/lifi/config.yaml 
+          
+      - name: 'SSH into bastion configure Kubeconfig'
+
+      - name: Set up SSH
+        run: |
+          jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+          sudo apt update
+          sudo apt install -y openssh-client
+          eval $(ssh-agent -s)
+          echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan "$jumpbox_ip" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+      - name: Create Tfvars file with sensitive data
+        run: |
+          cat <<EOF > extra.auto.tfvars
+          cloudflare_api_token = "${{ secrets.CF_API_TOKEN }}"
+          cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
+          cloudflare_email     = "${{ secrets.CF_EMAIL }}"
+          cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
+          instance_key = {
+            name   = "lifi"
+            public_key = "${{ secrets.PUBLIC_KEY }}"
+          }
+          smtp_password = "${{ secrets.SMTP_PWD }}"
+          EOF
+
+      - name: Clone repo
+        run: |
+          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "sudo apt install git -y && git clone https://github.com/nobleman97/bird-devops-challenge.git"
+        
+      - name: Add sensitive values
+        run: |
+          scp -o StrictHostKeyChecking=no -P 22 extra.auto.tfvars "ubuntu@$jumpbox_ip:~/bird*/infrastructure/terraform/apps"
+          
+
+    

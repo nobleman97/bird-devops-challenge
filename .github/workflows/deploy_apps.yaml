@@ -90,6 +90,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "
             sudo apt install git -y
+            rm  -rf bird-devops-challenge
             git clone https://nobleman97:${{ secrets.PAT_TOKEN }}@github.com/nobleman97/bird-devops-challenge.git
           "
         
@@ -100,7 +101,10 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "cd bird*/infrastructure/terraform/apps && terraform apply --auto-approve"
+          ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "
+            cd bird-devops-challenge/infrastructure/terraform/apps 
+            terraform apply --auto-approve
+          "
           
           
 

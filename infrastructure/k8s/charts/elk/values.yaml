@@ -2,13 +2,8 @@ elasticsearch:
   clusterName: "lifi"
   nodeGroup: "master"
 
-  # The service that non master groups will try to connect to when joining the cluster
-  # This should be set to clusterName + "-" + nodeGroup for your master group
   masterService: ""
 
-  # Elasticsearch roles that will be applied to this nodeGroup
-  # These will be set as environment variables. E.g. node.roles=master
-  # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#node-roles
   roles:
     - master
     - data
@@ -26,36 +21,25 @@ elasticsearch:
 
   esMajorVersion: ""
 
-  # Allows you to add any config files in /usr/share/elasticsearch/config/
-  # such as elasticsearch.yml and log4j2.properties
   esConfig: {}
 
   createCert: true
 
   esJvmOptions: {}
 
-  # Extra environment variables to append to this nodeGroup
-  # This will be appended to the current 'env:' key. You can use any of the kubernetes env
-  # syntax here
+
   extraEnvs: []
-  #  - name: MY_ENVIRONMENT_VAR
-  #    value: the_value_goes_here
+
 
   # Allows you to load environment variables from kubernetes secret or config map
   envFrom: []
-  # - secretRef:
-  #     name: env-secret
-  # - configMapRef:
-  #     name: config-map
+
 
   # Disable it to use your own elastic-credential Secret.
   secret:
     enabled: true
     password: "clumsypass#1234" # generated randomly if not defined
 
-  # A list of secrets and their paths to mount inside the pod
-  # This is useful for mounting certificates for security and for mounting
-  # the X-Pack license
   secretMounts: []
 
   hostAliases: []
@@ -129,29 +113,18 @@ elasticsearch:
 
   extraInitContainers: []
 
-  # This is the PriorityClass settings as defined in
-  # https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
-  priorityClassName: ""
+ 
 
   # By default this will make sure two pods don't end up on the same node
   # Changing this to a region would allow you to spread pods across regions
   antiAffinityTopologyKey: "kubernetes.io/hostname"
 
-  # Hard means that by default pods will only be scheduled if there are enough nodes for them
-  # and that they will never end up on the same node. Setting this to soft will do this "best effort"
+
   antiAffinity: "soft"
 
-  # This is the node affinity settings as defined in
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
-  nodeAffinity: {}
-
-  # The default is to deploy all pods serially. By setting this to parallel all pods are started at
-  # the same time when bootstrapping the cluster
   podManagementPolicy: "Parallel"
 
-  # The environment variables injected by service links are not used, but can lead to slow Elasticsearch boot times when
-  # there are many services in the current namespace.
-  # If you experience slow pod startups you probably want to set this to `false`.
+
   enableServiceLinks: true
 
   protocol: https
@@ -395,25 +368,11 @@ logstash:
 
   priorityClassName: ""
 
-  # By default this will make sure two pods don't end up on the same node
-  # Changing this to a region would allow you to spread pods across regions
-  antiAffinityTopologyKey: "kubernetes.io/hostname"
+
 
   # Hard means that by default pods will only be scheduled if there are enough nodes for them
   # and that they will never end up on the same node. Setting this to soft will do this "best effort"
   antiAffinity: "soft"
-
-  # This is the node affinity settings as defined in
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
-  nodeAffinity: {}
-
-  # This is inter-pod affinity settings as defined in
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
-  podAffinity: {}
-
-  # The default is to deploy all pods serially. By setting this to parallel all pods are started at
-  # the same time when bootstrapping the cluster
-  podManagementPolicy: "Parallel"
 
   httpPort: 9600
 
@@ -423,9 +382,6 @@ logstash:
 
   updateStrategy: RollingUpdate
 
-  # This is the max unavailable setting for the pod disruption budget
-  # The default value of 1 will make sure that kubernetes won't allow more than 1
-  # of your pods to be unavailable during maintenance
   maxUnavailable: 1
 
   podSecurityContext:
@@ -491,24 +447,6 @@ logstash:
         port: 8080
         protocol: TCP
         targetPort: 8080
-
-  # ingress:
-  #   enabled: true
-  #   annotations:
-  #     nginx.ingress.kubernetes.io/rewrite-target: /$1
-  #     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  #   className: "nginx"
-  #   pathtype: ImplementationSpecific
-  #   hosts:
-  #     - host: logstash.osose.xyz
-  #       paths:
-  #         - path: /beats
-  #           pathType: Prefix
-  #           servicePort: 5044
-  #         - path: /http
-  #           pathType: Prefix
-  #           servicePort: 8080
-  #   tls: []
 
   ingress:
     enabled: true
@@ -581,10 +519,6 @@ filebeat:
         secretName: lifi-master-certs
         path: /usr/share/filebeat/certs/
 
-    # Various pod security context settings. Bear in mind that many of these have an impact on Filebeat functioning properly.
-    #
-    # - User that the container will execute as. Typically necessary to run as root (0) in order to properly collect host container logs.
-    # - Whether to execute the Filebeat containers as privileged containers. Typically not necessarily unless running within environments such as OpenShift.
     securityContext:
       runAsUser: 0
       privileged: false
@@ -600,23 +534,6 @@ filebeat:
     tolerations: []
 
   deployment:
-    # Annotations to apply to the deployment
-    annotations: {}
-    # additionals labels
-    labels: {}
-    affinity: {}
-    # Include the deployment
-    enabled: false
-    # Extra environment variables for Filebeat container.
-    envFrom: []
-    # - configMapRef:
-    #     name: config-secret
-    extraEnvs: []
-    # Allows you to add any config files in /usr/share/filebeat
-    extraVolumes: []
-    # - name: extras
-    #   emptyDir: {}
-    extraVolumeMounts: []
 
     filebeatConfig:
       filebeat.yml: |
@@ -627,9 +544,6 @@ filebeat:
         output.logstash:
           hosts: ["logstash-logstash:5044"]
     nodeSelector: {}
-    # A list of secrets and their paths to mount inside the pod
-    # This is useful for mounting certificates for security other sensitive values
-    secretMounts: []
 
     securityContext:
       runAsUser: 0
@@ -711,28 +625,7 @@ filebeat:
         - list
         - watch
 
-  podAnnotations: {}
-  # iam.amazonaws.com/role: es-cluster
-
-  # Custom service account override that the pod will use
-  serviceAccount: ""
-
-  # Annotations to add to the ServiceAccount that is created if the serviceAccount value isn't set.
-  serviceAccountAnnotations: {}
-  # eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount
-
-  # How long to wait for Filebeat pods to stop gracefully
-  terminationGracePeriod: 30
-  # This is the PriorityClass settings as defined in
-  # https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
-  priorityClassName: ""
-
   updateStrategy: RollingUpdate
-
-  # Override various naming aspects of this chart
-  # Only edit these if you know what you're doing
-  nameOverride: ""
-  fullnameOverride: ""
 
 
 
@@ -753,27 +646,8 @@ kibana:
   #  - name: MY_ENVIRONMENT_VAR
   #    value: the_value_goes_here
 
-  # Allows you to load environment variables from kubernetes secret or config map
-  envFrom: []
-  # - secretRef:
-  #     name: env-secret
-  # - configMapRef:
-  #     name: config-map
-
-  # A list of secrets and their paths to mount inside the pod
-  # This is useful for mounting certificates for security and for mounting
-  # the X-Pack license
-  secretMounts: []
-  #  - name: kibana-keystore
-  #    secretName: kibana-keystore
-  #    path: /usr/share/kibana/data/kibana.keystore
-  #    subPath: kibana.keystore # optional
 
   hostAliases: []
-  #- ip: "127.0.0.1"
-  #  hostnames:
-  #  - "foo.local"
-  #  - "bar.local"
 
   image: "docker.elastic.co/kibana/kibana"
   imageTag: "8.5.1"
@@ -802,14 +676,6 @@ kibana:
   healthCheckPath: "/app/kibana"
 
   # Allows you to add any config files in /usr/share/kibana/config/
-  # such as kibana.yml
-  kibanaConfig: {}
-  #   kibana.yml: |
-  #     key:
-  #       nestedkey: value
-
-  # If Pod Security Policy in use it may be required to specify security context as well as service account
-
   podSecurityContext:
     fsGroup: 1000
 
@@ -837,12 +703,6 @@ kibana:
     # - name: extras
     #   emptyDir: {}
 
-  extraVolumeMounts:
-    []
-    # - name: extras
-    #   mountPath: /usr/share/extras
-    #   readOnly: true
-    #
 
   extraContainers: []
   # - name: dummy-init
@@ -864,11 +724,7 @@ kibana:
     nodePort: ""
     labels: {}
     annotations: {}
-    # cloud.google.com/load-balancer-type: "Internal"
-    # service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
-    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-    # service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
-    # service.beta.kubernetes.io/cce-load-balancer-internal-vpc: "true"
+
     loadBalancerSourceRanges: []
     # 0.0.0.0/0
     httpPortName: http
@@ -890,10 +746,7 @@ kibana:
                 name: elk-kibana
                 port:
                   number: 5601
-    #tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+
 
   readinessProbe:
     failureThreshold: 3
@@ -911,10 +764,3 @@ kibana:
   fullnameOverride: ""
 
   lifecycle: {}
-# preStop:
-#   exec:
-#     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
-# postStart:
-#   exec:
-#     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
-

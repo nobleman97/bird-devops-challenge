@@ -81,29 +81,29 @@ resource "helm_release" "birdimage" {
   depends_on = [ kubernetes_namespace.this["birdy"] ]
 }
 
-resource "helm_release" "prometheus" {
-  name = "prometheus"
-  chart = "prometheus-community/prometheus"
-  namespace = kubernetes_namespace.this["monitoring"].id
-  version = "25.27.0"
+# resource "helm_release" "prometheus" {
+#   name = "prometheus"
+#   chart = "prometheus-community/prometheus"
+#   namespace = kubernetes_namespace.this["monitoring"].id
+#   version = "25.27.0"
 
-  values = [
-    "${file("../../k8s/values/prom-values.yaml")}"
-  ]
-}
+#   values = [
+#     "${file("../../k8s/values/prom-values.yaml")}"
+#   ]
+# }
 
-resource "helm_release" "grafana" {
-  name = "grafana"
-  chart = "grafana/grafana"
-  namespace = kubernetes_namespace.this["monitoring"].id
-  version = "8.5.1"
+# resource "helm_release" "grafana" {
+#   name = "grafana"
+#   chart = "grafana/grafana"
+#   namespace = kubernetes_namespace.this["monitoring"].id
+#   version = "8.5.1"
 
-  values = [
-    "${file("../../k8s/values/grafana-values.yaml")}"
-  ]
+#   values = [
+#     "${file("../../k8s/values/grafana-values.yaml")}"
+#   ]
 
-  depends_on = [ kubernetes_secret.grafana_smtp_secret ]
-}
+#   depends_on = [ kubernetes_secret.grafana_smtp_secret ]
+# }
 
 resource "helm_release" "elk" {
   name = "elk"

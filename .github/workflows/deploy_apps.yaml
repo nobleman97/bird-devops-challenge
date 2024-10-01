@@ -104,7 +104,7 @@ jobs:
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
           ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "
             cd bird-devops-challenge/infrastructure/terraform/apps 
-            terraform apply --auto-approve
+            bash ../../scripts/bastion.sh
           "
           
           

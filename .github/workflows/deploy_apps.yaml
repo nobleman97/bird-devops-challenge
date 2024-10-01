@@ -79,32 +79,19 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-      # - name: Start SSH agent
-      #   uses: webfactory/ssh-agent@v0.5.3
-      #   with:
-      #     ssh-private-key: ${{ secrets.PRIVATE_KEY }}
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Setup SSH and Clone Repo
+      - name: Clone repo
         run: |
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
 
-          # Setup SSH key
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$jumpbox_ip" >> ~/.ssh/known_hosts
-
-          # Start the SSH agent
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
-
-          # SSH into the jumpbox and clone the repo
           ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "
-            sudo apt update &&
-            sudo apt install -y git &&
-            git clone git@github.com:nobleman97/bird-devops-challenge.git
+            sudo apt install git -y
+            git clone https://nobleman97:${{ secrets.PAT_TOKEN }}@github.com/nobleman97/bird-devops-challenge.git
           "
-
         
       - name: Add sensitive values
         run: |

@@ -87,8 +87,10 @@ jobs:
       - name: Clone repo
         run: |
           jumpbox_ip=$(terraform output | grep jumpbox | grep -v kubectl | awk '{print $3}' | sed 's/\"//g')
+
           ssh -o StrictHostKeyChecking=no "ubuntu@$jumpbox_ip" -p 22 "
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/k8s
+          sudo chmod 600 ~/.ssh/k8s
           cat  ~/.ssh/k8s
           eval $(ssh-agent -s)
           ssh-add -D

@@ -37,10 +37,6 @@ jobs:
           cloudflare_api_key   = "${{ secrets.CF_API_KEY }}"
           cloudflare_email     = "${{ secrets.CF_EMAIL }}"
           cloudflare_zone_id   = "${{ secrets.CF_ZONE_ID }}"
-          instance_key = {
-            name   = "lifi"
-            public_key = "${{ secrets.PUBLIC_KEY }}"
-          }
           smtp_password = "${{ secrets.SMTP_PWD }}"
           EOF
 

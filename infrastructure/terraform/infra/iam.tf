@@ -32,6 +32,18 @@ resource "aws_iam_policy" "kubernetes_s3_policy" {
           "dynamodb:Query"
         ]
         Resource = "arn:aws:dynamodb:us-east-1:305406349585:table/lifi_tf_lock"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeLoadBalancerAttributes",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:DescribeTargetGroupAttributes",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeListenerCertificates"
+        ]
+        Resource = "*"
       }
     ]
   })
